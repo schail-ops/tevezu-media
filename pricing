@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TevezuMedia — Pricing & Booking</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --brown-dark: #3D2512;
+      --brown-mid: #7C5C3E;
+      --brown-light: #9E7A55;
+      --brown-border: #DCC9B0;
+      --brown-accent: #C9A882;
+      --cream-bg: #FAF5EF;
+      --cream-hover: #F5EDE2;
+      --cream-card: #FAF5EF;
+      --text-muted: #7A6A5A;
+      --text-secondary: #9A8070;
+      --green-success: #3B6D11;
+      --green-bg: #F0F7EC;
+      --green-border: #9FC97A;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-pill: 999px;
+    }
+
+    body {
+      font-family: 'Georgia', serif;
+      background: #F7F0E8;
+      color: var(--brown-dark);
+      min-height: 100vh;
+      padding: 2.5rem 1rem 4rem;
+    }
+
+    .tm-wrap {
+      max-width: 880px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    .tm-header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+    .tm-brand {
+      font-size: 34px;
+      font-weight: normal;
+      color: var(--brown-mid);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .tm-divider {
+      width: 48px;
+      height: 1px;
+      background: var(--brown-accent);
+      margin: 12px auto;
+    }
+    .tm-tagline {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-style: italic;
+      letter-spacing: 0.02em;
+    }
+
+    /* Category tabs */
+    .category-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
+    .cat-btn {
+      padding: 7px 18px;
+      border-radius: var(--radius-pill);
+      font-size: 13px;
+      cursor: pointer;
+      border: 1px solid var(--brown-border);
+      background: transparent;
+      color: var(--brown-mid);
+      font-family: 'Georgia', serif;
+      letter-spacing: 0.03em;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .cat-btn.active {
+      background: var(--brown-mid);
+      color: var(--cream-bg);
+      border-color: var(--brown-mid);
+    }
+    .cat-btn:hover:not(.active) {
+      background: var(--cream-hover);
+      border-color: var(--brown-light);
+    }
+
+    /* Package grid */
+    .packages-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 2.5rem;
+    }
+
+    .pkg-card {
+      background: var(--cream-card);
+      border: 1px solid var(--brown-border);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s, transform 0.1s;
+    }
+    .pkg-card:hover {
+      border-color: var(--brown-light);
+      transform: translateY(-1px);
+    }
+    .pkg-card.selected {
+      border: 2px solid var(--brown-mid);
+      background: var(--cream-hover);
+    }
+
+    .pkg-badge {
+      display: inline-block;
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: var(--radius-pill);
+      background: var(--brown-border);
+      color: #5A3E28;
+      margin-bottom: 10px;
+      letter-spacing: 0.04em;
+      font-family: sans-serif;
+    }
+    .pkg-badge.popular {
+      background: var(--brown-mid);
+      color: var(--cream-bg);
+    }
+    .pkg-spacer { height: 22px; }
+
+    .pkg-name {
+      font-size: 15px;
+      font-weight: normal;
+      color: var(--brown-dark);
+      margin-bottom: 4px;
+      letter-spacing: 0.02em;
+    }
+    .pkg-price {
+      font-size: 26px;
+      color: var(--brown-mid);
+      margin-bottom: 3px;
+    }
+    .pkg-duration {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 14px;
+      font-family: sans-serif;
+    }
+    .pkg-features {
+      list-style: none;
+      padding: 0;
+    }
+    .pkg-features li {
+      font-size: 13px;
+      color: var(--text-muted);
+      padding: 3px 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 7px;
+      font-family: sans-serif;
+    }
+    .pkg-features li::before {
+      content: '';
+      display: inline-block;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--brown-accent);
+      margin-top: 6px;
+      flex-shrink: 0;
+    }
+
+    /* Divider */
+    .section-divider {
+      height: 1px;
+      background: var(--brown-border);
+      margin: 2.5rem 0;
+    }
+
+    /* Booking form */
+    .booking-title {
+      font-size: 20px;
+      font-weight: normal;
+      color: var(--brown-dark);
+      margin-bottom: 5px;
+      letter-spacing: 0.04em;
+    }
+    .booking-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      font-family: sans-serif;
+      font-style: italic;
+    }
+    .selected-pkg-note {
+      background: var(--cream-hover);
+      border: 1px solid var(--brown-border);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      font-size: 13px;
+      color: var(--brown-mid);
+      margin-bottom: 1.25rem;
+      display: none;
+      font-family: sans-serif;
+    }
+    .selected-pkg-note.visible { display: block; }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 0;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin-bottom: 14px;
+    }
+    .form-group label {
+      font-size: 11px;
+      color: var(--text-secondary);
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      font-family: sans-serif;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      padding: 10px 13px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--brown-border);
+      background: #FFFCF8;
+      font-size: 14px;
+      color: var(--brown-dark);
+      outline: none;
+      font-family: sans-serif;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--brown-light);
+      box-shadow: 0 0 0 3px rgba(124, 92, 62, 0.1);
+    }
+    .form-group textarea {
+      resize: vertical;
+      min-height: 90px;
+    }
+    .form-group select {
+      appearance: none;
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239E7A55' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 36px;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 13px;
+      border-radius: var(--radius-md);
+      background: var(--brown-mid);
+      color: var(--cream-bg);
+      border: none;
+      font-size: 15px;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      font-family: 'Georgia', serif;
+      margin-top: 4px;
+    }
+    .submit-btn:hover { background: var(--brown-dark); }
+    .submit-btn:active { transform: scale(0.99); }
+
+    .success-msg {
+      background: var(--green-bg);
+      border: 1px solid var(--green-border);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      text-align: center;
+      display: none;
+      margin-top: 1rem;
+    }
+    .success-msg.visible { display: block; }
+    .success-msg p {
+      color: var(--green-success);
+      font-size: 17px;
+      margin-bottom: 6px;
+    }
+    .success-msg span {
+      font-size: 13px;
+      color: #639922;
+      font-family: sans-serif;
+    }
+
+    .footer-note {
+      text-align: center;
+      margin-top: 3rem;
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-family: sans-serif;
+      letter-spacing: 0.03em;
+    }
+
+    @media (max-width: 520px) {
+      .form-row { grid-template-columns: 1fr; }
+      .tm-brand { font-size: 26px; }
+      .packages-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="tm-wrap">
+
+  <div class="tm-header">
+    <div class="tm-brand">TevezuMedia</div>
+    <div class="tm-divider"></div>
+    <div class="tm-tagline">Boston-based photography — portraits, events, weddings, lifestyle, family, sports &amp; mixtapes</div>
+  </div>
+
+  <div class="category-tabs" id="catTabs"></div>
+  <div class="packages-grid" id="packagesGrid"></div>
+
+  <div class="section-divider"></div>
+
+  <div class="booking-section">
+    <div class="booking-title">Book a session</div>
+    <div class="booking-sub">Fill out the form below and I'll get back to you within 24 hours.</div>
+    <div class="selected-pkg-note" id="pkgNote"></div>
+
+    <div id="bookingForm">
+      <div class="form-row">
+        <div class="form-group">
+          <label>First name</label>
+          <input type="text" id="fname" placeholder="Your first name" />
+        </div>
+        <div class="form-group">
+          <label>Last name</label>
+          <input type="text" id="lname" placeholder="Your last name" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="email" placeholder="you@email.com" />
+        </div>
+        <div class="form-group">
+          <label>Phone</label>
+          <input type="tel" id="phone" placeholder="(617) 000-0000" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Package interest</label>
+          <select id="pkgSelect">
+            <option value="">— Select a package —</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Preferred date</label>
+          <input type="date" id="pdate" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Tell me about your vision (optional)</label>
+        <textarea id="notes" placeholder="Location ideas, vibe, number of people, any details that help me prepare..."></textarea>
+      </div>
+      <button class="submit-btn" onclick="submitForm()">Send booking request</button>
+    </div>
+
+    <div class="success-msg" id="successMsg">
+      <p>Request sent!</p>
+      <span>Thanks for reaching out — I'll be in touch within 24 hours to confirm your session.</span>
+    </div>
+  </div>
+
+  <div class="footer-note">© TevezuMedia · Boston, MA · All rights reserved</div>
+
+</div>
+
+<script>
+  const categories = {
+    Portraits: [
+      { name: "Quick shoot", price: "$120", duration: "30 min · up to 15 edited photos", features: ["1 location", "Online gallery delivery", "Personal use license"], badge: "" },
+      { name: "Standard portrait", price: "$200", duration: "1 hr · up to 30 edited photos", features: ["1–2 locations", "Online gallery", "Print-ready files"], badge: "popular" },
+      { name: "Extended portrait", price: "$320", duration: "2 hrs · up to 60 edited photos", features: ["Multiple locations", "Outfit changes", "Online gallery + USB"], badge: "" }
+    ],
+    Events: [
+      { name: "Coverage starter", price: "$250", duration: "2 hrs · unlimited shots", features: ["Full edited gallery", "Online delivery", "Commercial use license"], badge: "" },
+      { name: "Half-day coverage", price: "$450", duration: "4 hrs · unlimited shots", features: ["Full edited gallery", "Highlight reel preview", "Print-ready files"], badge: "popular" },
+      { name: "Full-day coverage", price: "$750", duration: "8 hrs · unlimited shots", features: ["Full edited gallery", "Sneak peeks within 48 hrs", "USB + online delivery"], badge: "" }
+    ],
+    Weddings: [
+      { name: "Elopement", price: "$600", duration: "3 hrs · ceremony + portraits", features: ["Full edited gallery (100+ photos)", "Online gallery", "Print license"], badge: "" },
+      { name: "Essential wedding", price: "$1,200", duration: "6 hrs · ceremony to reception", features: ["Full edited gallery (300+ photos)", "Sneak peeks in 48 hrs", "USB + online"], badge: "popular" },
+      { name: "Full celebration", price: "$1,800", duration: "10 hrs · all-day coverage", features: ["Unlimited edited photos", "Second shooter available", "USB + print license"], badge: "" }
+    ],
+    Lifestyle: [
+      { name: "Lifestyle mini", price: "$150", duration: "45 min · up to 20 edited photos", features: ["1 location", "Natural/candid style", "Online gallery"], badge: "" },
+      { name: "Lifestyle session", price: "$275", duration: "90 min · up to 45 edited photos", features: ["2 locations", "Candid + posed", "Online gallery + print files"], badge: "popular" }
+    ],
+    Family: [
+      { name: "Family mini", price: "$175", duration: "45 min · up to 25 edited photos", features: ["Up to 6 people", "1 location", "Online gallery"], badge: "" },
+      { name: "Family session", price: "$300", duration: "90 min · up to 50 edited photos", features: ["Up to 10 people", "2 locations", "Online gallery + print files"], badge: "popular" }
+    ],
+    Sports: [
+      { name: "Game coverage", price: "$200", duration: "Full game · action shots", features: ["Edited highlights (50+ photos)", "Online gallery", "Digital delivery"], badge: "" },
+      { name: "Athlete portraits", price: "$175", duration: "1 hr · on-court or studio", features: ["30 edited photos", "Promo-ready files", "Commercial license"], badge: "popular" }
+    ],
+    Mixtapes: [
+      { name: "Mixtape shoot", price: "$250", duration: "2 hrs · basketball focus", features: ["60+ action + portrait shots", "Online gallery", "Social media ready files"], badge: "popular" },
+      { name: "Full promo package", price: "$400", duration: "3 hrs · complete promo set", features: ["100+ edited photos", "Cover art ready", "Commercial + social license"], badge: "" }
+    ]
+  };
+
+  let selectedPkg = null;
+  let activeCategory = "Portraits";
+
+  function buildCategoryTabs() {
+    const tabs = document.getElementById("catTabs");
+    tabs.innerHTML = "";
+    Object.keys(categories).forEach(cat => {
+      const btn = document.createElement("button");
+      btn.className = "cat-btn" + (cat === activeCategory ? " active" : "");
+      btn.textContent = cat;
+      btn.onclick = () => {
+        activeCategory = cat;
+        document.querySelectorAll(".cat-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        buildPackages();
+      };
+      tabs.appendChild(btn);
+    });
+  }
+
+  function buildPackages() {
+    const grid = document.getElementById("packagesGrid");
+    grid.innerHTML = "";
+    const pkgs = categories[activeCategory];
+    pkgs.forEach(pkg => {
+      const card = document.createElement("div");
+      const isSelected = selectedPkg && selectedPkg.name === pkg.name && selectedPkg.cat === activeCategory;
+      card.className = "pkg-card" + (isSelected ? " selected" : "");
+      card.innerHTML = `
+        ${pkg.badge === "popular"
+          ? `<div class="pkg-badge popular">Most popular</div>`
+          : pkg.badge
+          ? `<div class="pkg-badge">${pkg.badge}</div>`
+          : `<div class="pkg-spacer"></div>`}
+        <div class="pkg-name">${pkg.name}</div>
+        <div class="pkg-price">${pkg.price}</div>
+        <div class="pkg-duration">${pkg.duration}</div>
+        <ul class="pkg-features">${pkg.features.map(f => `<li>${f}</li>`).join("")}</ul>
+      `;
+      card.onclick = () => {
+        selectedPkg = { name: pkg.name, cat: activeCategory, price: pkg.price };
+        buildPackages();
+        updateNote();
+        syncSelect();
+      };
+      grid.appendChild(card);
+    });
+  }
+
+  function updateNote() {
+    const note = document.getElementById("pkgNote");
+    if (selectedPkg) {
+      note.textContent = `Selected: ${selectedPkg.cat} — ${selectedPkg.name} (${selectedPkg.price})`;
+      note.classList.add("visible");
+    }
+  }
+
+  function buildSelect() {
+    const sel = document.getElementById("pkgSelect");
+    sel.innerHTML = `<option value="">— Select a package —</option>`;
+    Object.keys(categories).forEach(cat => {
+      categories[cat].forEach(pkg => {
+        const opt = document.createElement("option");
+        opt.value = `${cat} — ${pkg.name}`;
+        opt.textContent = `${cat} — ${pkg.name} (${pkg.price})`;
+        sel.appendChild(opt);
+      });
+    });
+  }
+
+  function syncSelect() {
+    if (selectedPkg) {
+      document.getElementById("pkgSelect").value = `${selectedPkg.cat} — ${selectedPkg.name}`;
+    }
+  }
+
+  async function submitForm() {
+    const fname = document.getElementById("fname").value.trim();
+    const lname = document.getElementById("lname").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const pkg = document.getElementById("pkgSelect").value;
+    const date = document.getElementById("pdate").value;
+    const notes = document.getElementById("notes").value.trim();
+
+    if (!fname || !email) {
+      alert("Please fill in at least your name and email to send a request.");
+      return;
+    }
+
+    const btn = document.querySelector(".submit-btn");
+    btn.textContent = "Sending...";
+    btn.disabled = true;
+
+    const SHEET_URL = "https://script.google.com/macros/s/AKfycbyUduwO3OwgD-rIJP65y7aomic_qL3dGuLBsgDxZYtfu1wRJqU7rjBXibgMFl6AOqHc/exec";
+
+    try {
+      await fetch(SHEET_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fname, lname, email, phone, package: pkg, date, notes })
+      });
+      document.getElementById("bookingForm").style.display = "none";
+      document.getElementById("successMsg").classList.add("visible");
+    } catch (err) {
+      btn.textContent = "Send booking request";
+      btn.disabled = false;
+      alert("Something went wrong. Please try again or reach out directly.");
+    }
+  }
+
+  buildCategoryTabs();
+  buildPackages();
+  buildSelect();
+</script>
+
+</body>
+</html>
