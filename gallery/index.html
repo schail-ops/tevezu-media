@@ -1,0 +1,805 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gallery — TevezuMedia</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --brown: #7C5C3E;
+      --brown-light: #A07850;
+      --brown-pale: #C9A882;
+      --cream: #FAF5EF;
+      --cream-2: #F5EDE2;
+      --muted: #9A8070;
+      --muted-2: #7A6A5A;
+      --border: rgba(220,201,176,0.35);
+      --star-color: #E8D9C0;
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      font-family: 'DM Sans', sans-serif;
+      background: #0E0804;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      padding: 1.1rem 2.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(14, 8, 4, 0.75);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-brand {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 21px; font-weight: 400; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--brown-pale);
+      text-decoration: none; transition: color 0.2s;
+    }
+    .nav-brand:hover { color: var(--cream); }
+    .nav-links { display: flex; gap: 2rem; align-items: center; }
+    .nav-links a {
+      font-size: 12px; font-weight: 400; letter-spacing: 0.09em;
+      text-transform: uppercase; color: rgba(201,168,130,0.55);
+      text-decoration: none; transition: color 0.2s;
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--brown-pale); }
+
+    /* FILTER BAR */
+    .filter-bar {
+      position: fixed; top: 62px; left: 0; right: 0; z-index: 190;
+      padding: 0.65rem 2.5rem;
+      display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+      background: rgba(14, 8, 4, 0.65);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .filter-btn {
+      padding: 5px 15px; border-radius: 2px;
+      font-size: 11px; font-weight: 400; letter-spacing: 0.08em;
+      text-transform: uppercase; cursor: pointer;
+      border: 1px solid rgba(201,168,130,0.25);
+      background: transparent; color: rgba(201,168,130,0.5);
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.18s;
+    }
+    .filter-btn.active {
+      background: var(--brown); color: var(--cream);
+      border-color: var(--brown);
+    }
+    .filter-btn:hover:not(.active) {
+      border-color: var(--brown-pale); color: var(--brown-pale);
+      background: rgba(124,92,62,0.12);
+    }
+    .filter-hint {
+      margin-left: auto;
+      font-size: 11px; font-weight: 300;
+      color: rgba(201,168,130,0.35);
+      font-style: italic; letter-spacing: 0.04em;
+    }
+
+    /* STAR CANVAS (behind everything) */
+    #starCanvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* CANVAS CONTAINER */
+    .canvas-wrap {
+      position: fixed;
+      top: 108px; left: 0; right: 0; bottom: 0;
+      overflow: hidden;
+      cursor: grab;
+      z-index: 1;
+    }
+    .canvas-wrap.grabbing { cursor: grabbing; }
+
+    /* WORLD */
+    #world {
+      position: absolute;
+      top: 0; left: 0;
+      width: 5000px; height: 4000px;
+      transform-origin: 0 0;
+      will-change: transform;
+    }
+
+    /* PHOTO NODES */
+    .photo-node {
+      position: absolute;
+      border-radius: 50%;
+      overflow: visible;
+      cursor: pointer;
+      transition: filter 0.3s;
+    }
+    .planet-inner {
+      width: 100%; height: 100%;
+      border-radius: 50%;
+      overflow: hidden;
+      position: relative;
+      transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                  box-shadow 0.4s;
+      box-shadow: 0 0 0 1.5px rgba(201,168,130,0.15),
+                  0 0 20px rgba(201,168,130,0.08),
+                  0 8px 32px rgba(0,0,0,0.5);
+    }
+    .photo-node:hover .planet-inner {
+      transform: scale(1.1);
+      box-shadow: 0 0 0 2px rgba(201,168,130,0.5),
+                  0 0 30px rgba(201,168,130,0.25),
+                  0 0 60px rgba(124,92,62,0.2),
+                  0 16px 48px rgba(0,0,0,0.6);
+    }
+    .planet-inner img {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+      transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      pointer-events: none;
+    }
+    .photo-node:hover .planet-inner img { transform: scale(1.12); }
+
+    /* orbit ring */
+    .orbit-ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(201,168,130,0.12);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      transition: border-color 0.4s, transform 0.4s;
+      animation: orbitSpin 18s linear infinite;
+    }
+    .photo-node:hover .orbit-ring {
+      border-color: rgba(201,168,130,0.35);
+    }
+    @keyframes orbitSpin {
+      from { transform: translate(-50%, -50%) rotate(0deg); }
+      to { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    /* orbit dot */
+    .orbit-dot {
+      position: absolute;
+      width: 4px; height: 4px;
+      border-radius: 50%;
+      background: rgba(201,168,130,0.6);
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .photo-node:hover .orbit-dot { opacity: 1; }
+
+    /* glow pulse animation assigned per node via JS */
+    @keyframes float0 {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+    @keyframes float1 {
+      0%, 100% { transform: translateY(-6px); }
+      50% { transform: translateY(8px); }
+    }
+    @keyframes float2 {
+      0%, 100% { transform: translateY(4px); }
+      50% { transform: translateY(-12px); }
+    }
+    @keyframes float3 {
+      0%, 100% { transform: translateY(-4px); }
+      50% { transform: translateY(6px); }
+    }
+    @keyframes glowPulse {
+      0%, 100% { opacity: 0.08; }
+      50% { opacity: 0.22; }
+    }
+
+    /* node label */
+    .node-label {
+      position: absolute;
+      bottom: -30px; left: 50%; transform: translateX(-50%);
+      white-space: nowrap;
+      font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+      color: rgba(201,168,130,0.65); opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      text-shadow: 0 0 10px rgba(0,0,0,0.8);
+    }
+    .photo-node:hover .node-label { opacity: 1; }
+
+    .node-placeholder {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(124,92,62,0.15);
+      border-radius: 50%;
+    }
+    .node-placeholder span {
+      font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: rgba(201,168,130,0.5); text-align: center; padding: 8px;
+    }
+
+    .photo-node.hidden { display: none !important; }
+
+    /* CURSOR RING */
+    .cursor-ring {
+      position: fixed; z-index: 999;
+      width: 36px; height: 36px;
+      border: 1px solid rgba(201,168,130,0.5);
+      border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      transition: width 0.25s, height 0.25s, border-color 0.25s, opacity 0.2s;
+      opacity: 0;
+    }
+    .cursor-ring.visible { opacity: 1; }
+    .cursor-ring.big {
+      width: 64px; height: 64px;
+      border-color: var(--brown-pale);
+      border-width: 1.5px;
+    }
+    .cursor-dot {
+      position: fixed; z-index: 999;
+      width: 4px; height: 4px;
+      background: var(--brown-pale);
+      border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .cursor-dot.visible { opacity: 1; }
+
+    /* LIGHTBOX */
+    .lightbox {
+      position: fixed; inset: 0; z-index: 500;
+      background: rgba(6, 3, 1, 0.97);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.4s;
+    }
+    .lightbox.open { opacity: 1; pointer-events: all; }
+    .lb-img-wrap {
+      position: relative;
+      transform: scale(0.82) translateY(20px);
+      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .lightbox.open .lb-img-wrap { transform: scale(1) translateY(0); }
+    .lightbox img {
+      max-width: 88vw; max-height: 82vh;
+      object-fit: contain; border-radius: 2px; display: block;
+      box-shadow: 0 0 80px rgba(201,168,130,0.08);
+    }
+    .lb-close {
+      position: fixed; top: 1.5rem; right: 2rem;
+      font-size: 24px; color: rgba(201,168,130,0.45);
+      cursor: pointer; background: none; border: none;
+      transition: color 0.2s; z-index: 10; font-family: sans-serif;
+    }
+    .lb-close:hover { color: var(--cream); }
+    .lb-info {
+      position: fixed; bottom: 2rem; left: 0; right: 0; text-align: center;
+    }
+    .lb-cat {
+      font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: rgba(201,168,130,0.35); margin-bottom: 5px;
+    }
+    .lb-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 20px; font-weight: 300; color: rgba(201,168,130,0.75);
+    }
+    .lb-nav {
+      position: fixed; top: 50%; transform: translateY(-50%);
+      background: none; border: 1px solid rgba(201,168,130,0.15);
+      color: rgba(201,168,130,0.4); font-size: 16px;
+      width: 40px; height: 40px; border-radius: 2px;
+      cursor: pointer; transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .lb-nav:hover { border-color: rgba(201,168,130,0.5); color: var(--brown-pale); }
+    .lb-prev { left: 1.5rem; }
+    .lb-next { right: 1.5rem; }
+
+    /* DRAG HINT */
+    .drag-hint {
+      position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
+      font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+      color: rgba(201,168,130,0.4); pointer-events: none; white-space: nowrap;
+      animation: hintFade 5s 2s ease forwards;
+      opacity: 0;
+    }
+    @keyframes hintFade {
+      0% { opacity: 0; transform: translateX(-50%) translateY(8px); }
+      15% { opacity: 1; transform: translateX(-50%) translateY(0); }
+      75% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
+    @media (max-width: 600px) {
+      nav { padding: 0.9rem 1.25rem; }
+      .filter-bar { top: 56px; padding: 0.5rem 1.25rem; }
+      .canvas-wrap { top: 100px; }
+      .nav-links a { display: none; }
+      .nav-links a:last-child { display: block; }
+      .filter-hint { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- star background canvas -->
+  <canvas id="starCanvas"></canvas>
+
+  <nav>
+    <a class="nav-brand" href="https://tevezu.com" target="_blank">TevezuMedia</a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="gallery.html" class="active">Gallery</a>
+      <a href="pricing.html">Pricing</a>
+      <a href="contact.html">Contact</a>
+    </div>
+  </nav>
+
+  <div class="filter-bar">
+    <button class="filter-btn active" data-filter="all">All</button>
+    <button class="filter-btn" data-filter="portraits">Portraits</button>
+    <button class="filter-btn" data-filter="events">Events</button>
+    <button class="filter-btn" data-filter="weddings">Weddings</button>
+    <button class="filter-btn" data-filter="lifestyle">Lifestyle</button>
+    <button class="filter-btn" data-filter="family">Family</button>
+    <button class="filter-btn" data-filter="sports">Sports</button>
+    <button class="filter-btn" data-filter="mixtapes">Mixtapes</button>
+    <div class="filter-hint">Drag to explore · Click to open</div>
+  </div>
+
+  <div class="canvas-wrap" id="canvasWrap">
+    <div id="world"></div>
+  </div>
+
+  <div class="cursor-ring" id="cursorRing"></div>
+  <div class="cursor-dot" id="cursorDot"></div>
+
+  <div class="drag-hint">Drag to explore · Click a photo to open</div>
+
+  <div class="lightbox" id="lightbox">
+    <button class="lb-close" id="lbClose">&#x2715;</button>
+    <button class="lb-nav lb-prev" id="lbPrev">&#8592;</button>
+    <div class="lb-img-wrap">
+      <img src="" alt="" id="lbImg" />
+    </div>
+    <button class="lb-nav lb-next" id="lbNext">&#8594;</button>
+    <div class="lb-info">
+      <div class="lb-cat" id="lbCat"></div>
+      <div class="lb-title" id="lbTitle"></div>
+    </div>
+  </div>
+
+<script>
+  /*
+    HOW TO ADD YOUR PHOTOS:
+    1. Create an "images" folder in your GitHub repo
+    2. Upload your photos there
+    3. Add each one below:
+       { src: "images/filename.jpg", cat: "category", title: "Name" }
+    Categories: portraits, events, weddings, lifestyle, family, sports, mixtapes
+  */
+  const photos = [
+    { src: "images/portraits-1.jpg",  cat: "portraits",  title: "Portrait session" },
+    { src: "images/portraits-2.jpg",  cat: "portraits",  title: "Portrait session" },
+    { src: "images/portraits-3.jpg",  cat: "portraits",  title: "Portrait session" },
+    { src: "images/portraits-4.jpg",  cat: "portraits",  title: "Portrait session" },
+    { src: "images/events-1.jpg",     cat: "events",     title: "Event coverage" },
+    { src: "images/events-2.jpg",     cat: "events",     title: "Event coverage" },
+    { src: "images/events-3.jpg",     cat: "events",     title: "Event coverage" },
+    { src: "images/lifestyle-1.jpg",  cat: "lifestyle",  title: "Lifestyle session" },
+    { src: "images/lifestyle-2.jpg",  cat: "lifestyle",  title: "Lifestyle session" },
+    { src: "images/lifestyle-3.jpg",  cat: "lifestyle",  title: "Lifestyle session" },
+    { src: "images/sports-1.jpg",     cat: "sports",     title: "Game coverage" },
+    { src: "images/sports-2.jpg",     cat: "sports",     title: "Game coverage" },
+    { src: "images/sports-3.jpg",     cat: "sports",     title: "Athlete portraits" },
+    { src: "images/sports-4.jpg",   cat: "sports",   title: "Mixtape shoot" },
+    { src: "images/sports-5.jpg",   cat: "sports",   title: "Mixtape shoot" },
+    { src: "images/sports-6.jpg",   cat: "sports",   title: "Mixtape shoot" },
+  ];
+
+  /* ── STAR FIELD ── */
+  const starCanvas = document.getElementById("starCanvas");
+  const ctx = starCanvas.getContext("2d");
+  let stars = [];
+  let shootingStars = [];
+
+  function resizeStarCanvas() {
+    starCanvas.width = window.innerWidth;
+    starCanvas.height = window.innerHeight;
+  }
+  resizeStarCanvas();
+  window.addEventListener("resize", resizeStarCanvas);
+
+  function initStars() {
+    stars = [];
+    const count = Math.floor((window.innerWidth * window.innerHeight) / 3000);
+    for (let i = 0; i < count; i++) {
+      stars.push({
+        x: Math.random() * starCanvas.width,
+        y: Math.random() * starCanvas.height,
+        r: Math.random() * 1.4 + 0.2,
+        alpha: Math.random() * 0.7 + 0.15,
+        speed: Math.random() * 0.004 + 0.001,
+        phase: Math.random() * Math.PI * 2,
+        color: Math.random() > 0.85
+          ? `rgba(230, 200, 160, `
+          : Math.random() > 0.5
+          ? `rgba(220, 220, 240, `
+          : `rgba(232, 217, 192, `
+      });
+    }
+  }
+  initStars();
+
+  function spawnShootingStar() {
+    shootingStars.push({
+      x: Math.random() * starCanvas.width * 1.2,
+      y: Math.random() * starCanvas.height * 0.5,
+      len: Math.random() * 120 + 60,
+      speed: Math.random() * 8 + 6,
+      alpha: 1,
+      angle: Math.PI / 4 + (Math.random() - 0.5) * 0.3,
+      life: 1
+    });
+  }
+
+  setInterval(spawnShootingStar, 3500);
+
+  function animateStars(t) {
+    ctx.clearRect(0, 0, starCanvas.width, starCanvas.height);
+
+    // nebula clouds
+    const nebulas = [
+      { x: starCanvas.width * 0.2, y: starCanvas.height * 0.3, r: 300, c: "rgba(124,92,62," },
+      { x: starCanvas.width * 0.75, y: starCanvas.height * 0.65, r: 250, c: "rgba(80,60,100," },
+      { x: starCanvas.width * 0.5, y: starCanvas.height * 0.1, r: 200, c: "rgba(100,70,50," },
+    ];
+    nebulas.forEach(n => {
+      const g = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r);
+      g.addColorStop(0, n.c + "0.04)");
+      g.addColorStop(1, n.c + "0)");
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // stars with twinkle
+    stars.forEach(s => {
+      const twinkle = s.alpha + Math.sin(t * s.speed * 60 + s.phase) * 0.25;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = s.color + Math.max(0, Math.min(1, twinkle)) + ")";
+      ctx.fill();
+
+      // cross sparkle on bigger stars
+      if (s.r > 1.2) {
+        ctx.strokeStyle = s.color + (twinkle * 0.4) + ")";
+        ctx.lineWidth = 0.5;
+        ctx.beginPath();
+        ctx.moveTo(s.x - s.r * 2.5, s.y);
+        ctx.lineTo(s.x + s.r * 2.5, s.y);
+        ctx.moveTo(s.x, s.y - s.r * 2.5);
+        ctx.lineTo(s.x, s.y + s.r * 2.5);
+        ctx.stroke();
+      }
+    });
+
+    // shooting stars
+    shootingStars = shootingStars.filter(ss => ss.life > 0);
+    shootingStars.forEach(ss => {
+      ss.x += Math.cos(ss.angle) * ss.speed;
+      ss.y += Math.sin(ss.angle) * ss.speed;
+      ss.life -= 0.018;
+
+      const tailX = ss.x - Math.cos(ss.angle) * ss.len;
+      const tailY = ss.y - Math.sin(ss.angle) * ss.len;
+      const g = ctx.createLinearGradient(tailX, tailY, ss.x, ss.y);
+      g.addColorStop(0, `rgba(232,217,192,0)`);
+      g.addColorStop(0.7, `rgba(232,217,192,${ss.life * 0.6})`);
+      g.addColorStop(1, `rgba(255,240,210,${ss.life})`);
+      ctx.beginPath();
+      ctx.moveTo(tailX, tailY);
+      ctx.lineTo(ss.x, ss.y);
+      ctx.strokeStyle = g;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // head glow
+      const hg = ctx.createRadialGradient(ss.x, ss.y, 0, ss.x, ss.y, 4);
+      hg.addColorStop(0, `rgba(255,240,210,${ss.life})`);
+      hg.addColorStop(1, `rgba(255,240,210,0)`);
+      ctx.beginPath();
+      ctx.arc(ss.x, ss.y, 4, 0, Math.PI * 2);
+      ctx.fillStyle = hg;
+      ctx.fill();
+    });
+
+    requestAnimationFrame(animateStars);
+  }
+  requestAnimationFrame(animateStars);
+
+  /* ── WORLD / PLANETS ── */
+  const worldW = 5000, worldH = 4000;
+  const sizes = [170,210,250,185,230,145,270,205,185,165,250,210,230,190,165,250,210,185,230,205,270];
+  const placed = [];
+
+  function doesOverlap(x, y, r) {
+    for (const p of placed) {
+      const dx = x - p.x, dy = y - p.y;
+      if (Math.sqrt(dx*dx + dy*dy) < r + p.r + 60) return true;
+    }
+    return false;
+  }
+
+  const floatAnims = ["float0","float1","float2","float3"];
+  const floatDurations = [5, 6.5, 4.5, 7, 5.5, 8];
+
+  function placePhotos() {
+    const world = document.getElementById("world");
+    world.innerHTML = "";
+    placed.length = 0;
+
+    photos.forEach((photo, i) => {
+      const size = sizes[i % sizes.length];
+      const r = size / 2;
+      const orbitSize = size + 36;
+      let x, y, tries = 0;
+      do {
+        x = r + 60 + Math.random() * (worldW - size - 120);
+        y = r + 60 + Math.random() * (worldH - size - 120);
+        tries++;
+      } while (doesOverlap(x, y, r) && tries < 300);
+      placed.push({ x, y, r });
+
+      const floatAnim = floatAnims[i % floatAnims.length];
+      const floatDur = floatDurations[i % floatDurations.length];
+      const floatDelay = (Math.random() * 3).toFixed(1);
+
+      const node = document.createElement("div");
+      node.className = "photo-node";
+      node.dataset.index = i;
+      node.dataset.cat = photo.cat;
+      node.style.cssText = `
+        left: ${x - r}px;
+        top: ${y - r}px;
+        width: ${size}px;
+        height: ${size}px;
+        animation: ${floatAnim} ${floatDur}s ${floatDelay}s ease-in-out infinite;
+      `;
+
+      node.innerHTML = `
+        <div class="planet-inner">
+          <img
+            src="${photo.src}"
+            alt="${photo.title}"
+            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+          />
+          <div class="node-placeholder" style="display:none">
+            <span>${photo.cat}</span>
+          </div>
+        </div>
+        <div class="orbit-ring" style="width:${orbitSize}px; height:${orbitSize}px; animation-duration:${(floatDur * 3).toFixed(0)}s;">
+          <div class="orbit-dot"></div>
+        </div>
+        <div class="node-label">${photo.title}</div>
+      `;
+
+      node.addEventListener("click", (e) => {
+        if (!wasDragging) { e.stopPropagation(); openLightbox(i); }
+      });
+      world.appendChild(node);
+    });
+  }
+
+  placePhotos();
+
+  /* ── PAN & ZOOM ── */
+  const wrap = document.getElementById("canvasWrap");
+  const world = document.getElementById("world");
+  let panX = -800, panY = -400, scale = 0.42;
+  let isPanning = false, startX = 0, startY = 0, startPanX = 0, startPanY = 0;
+  let wasDragging = false;
+  let velX = 0, velY = 0;
+  let lastMX = 0, lastMY = 0;
+  let momentum = null;
+
+  function applyTransform(smooth) {
+    world.style.transition = smooth ? "transform 0.35s cubic-bezier(0.25,0.46,0.45,0.94)" : "none";
+    world.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+  }
+  applyTransform(false);
+
+  wrap.addEventListener("wheel", (e) => {
+    e.preventDefault();
+    const rect = wrap.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+    const zf = e.deltaY < 0 ? 1.1 : 0.91;
+    const ns = Math.min(2.8, Math.max(0.18, scale * zf));
+    panX = mx - (mx - panX) * (ns / scale);
+    panY = my - (my - panY) * (ns / scale);
+    scale = ns;
+    applyTransform(false);
+  }, { passive: false });
+
+  wrap.addEventListener("mousedown", (e) => {
+    if (momentum) { cancelAnimationFrame(momentum); momentum = null; }
+    isPanning = true; wasDragging = false;
+    startX = e.clientX; startY = e.clientY;
+    startPanX = panX; startPanY = panY;
+    lastMX = e.clientX; lastMY = e.clientY;
+    velX = 0; velY = 0;
+    wrap.classList.add("grabbing");
+  });
+
+  window.addEventListener("mousemove", (e) => {
+    if (!isPanning) return;
+    const dx = e.clientX - startX, dy = e.clientY - startY;
+    velX = e.clientX - lastMX; velY = e.clientY - lastMY;
+    lastMX = e.clientX; lastMY = e.clientY;
+    if (Math.abs(dx) > 4 || Math.abs(dy) > 4) wasDragging = true;
+    panX = startPanX + dx; panY = startPanY + dy;
+    applyTransform(false);
+  });
+
+  window.addEventListener("mouseup", () => {
+    if (!isPanning) return;
+    isPanning = false;
+    wrap.classList.remove("grabbing");
+    // momentum
+    if (Math.abs(velX) > 1 || Math.abs(velY) > 1) {
+      let vx = velX * 0.9, vy = velY * 0.9;
+      function coast() {
+        if (Math.abs(vx) < 0.3 && Math.abs(vy) < 0.3) return;
+        panX += vx; panY += vy;
+        vx *= 0.94; vy *= 0.94;
+        applyTransform(false);
+        momentum = requestAnimationFrame(coast);
+      }
+      coast();
+    }
+    setTimeout(() => { wasDragging = false; }, 50);
+  });
+
+  // touch
+  let lastTouchX = 0, lastTouchY = 0, touchStartX = 0, lastPinchDist = 0;
+  wrap.addEventListener("touchstart", (e) => {
+    if (e.touches.length === 1) {
+      lastTouchX = touchStartX = e.touches[0].clientX;
+      lastTouchY = e.touches[0].clientY;
+      wasDragging = false;
+    } else if (e.touches.length === 2) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      lastPinchDist = Math.sqrt(dx*dx + dy*dy);
+    }
+  }, { passive: true });
+
+  wrap.addEventListener("touchmove", (e) => {
+    e.preventDefault();
+    if (e.touches.length === 1) {
+      const dx = e.touches[0].clientX - lastTouchX;
+      const dy = e.touches[0].clientY - lastTouchY;
+      if (Math.abs(e.touches[0].clientX - touchStartX) > 6) wasDragging = true;
+      panX += dx; panY += dy;
+      lastTouchX = e.touches[0].clientX; lastTouchY = e.touches[0].clientY;
+      applyTransform(false);
+    } else if (e.touches.length === 2) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      const zf = dist / lastPinchDist;
+      const mx = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+      const my = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+      const ns = Math.min(2.8, Math.max(0.18, scale * zf));
+      panX = mx - (mx - panX) * (ns / scale);
+      panY = my - (my - panY) * (ns / scale);
+      scale = ns; lastPinchDist = dist;
+      applyTransform(false);
+    }
+  }, { passive: false });
+
+  /* ── CURSOR ── */
+  const ring = document.getElementById("cursorRing");
+  const dot = document.getElementById("cursorDot");
+  let rx = 0, ry = 0, mx2 = 0, my2 = 0;
+
+  document.addEventListener("mousemove", (e) => {
+    mx2 = e.clientX; my2 = e.clientY;
+    dot.style.left = e.clientX + "px";
+    dot.style.top = e.clientY + "px";
+    dot.classList.add("visible");
+    ring.classList.add("visible");
+    if (e.target.closest(".photo-node")) ring.classList.add("big");
+    else ring.classList.remove("big");
+  });
+
+  // smooth cursor lag
+  (function lagCursor() {
+    rx += (mx2 - rx) * 0.14;
+    ry += (my2 - ry) * 0.14;
+    ring.style.left = rx + "px";
+    ring.style.top = ry + "px";
+    requestAnimationFrame(lagCursor);
+  })();
+
+  document.addEventListener("mouseleave", () => {
+    ring.classList.remove("visible");
+    dot.classList.remove("visible");
+  });
+
+  /* ── FILTER ── */
+  let activeFilter = "all";
+  document.querySelectorAll(".filter-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      activeFilter = btn.dataset.filter;
+      document.querySelectorAll(".photo-node").forEach(node => {
+        if (activeFilter === "all" || node.dataset.cat === activeFilter) {
+          node.classList.remove("hidden");
+        } else {
+          node.classList.add("hidden");
+        }
+      });
+    });
+  });
+
+  const hash = window.location.hash.replace("#", "");
+  if (hash) {
+    const matchBtn = document.querySelector(`[data-filter="${hash}"]`);
+    if (matchBtn) matchBtn.click();
+  }
+
+  /* ── LIGHTBOX ── */
+  let currentIndex = 0;
+  function openLightbox(index) {
+    currentIndex = index;
+    const p = photos[index];
+    document.getElementById("lbImg").src = p.src;
+    document.getElementById("lbImg").alt = p.title;
+    document.getElementById("lbCat").textContent = p.cat;
+    document.getElementById("lbTitle").textContent = p.title;
+    document.getElementById("lightbox").classList.add("open");
+    document.body.style.overflow = "hidden";
+  }
+  function closeLightbox() {
+    document.getElementById("lightbox").classList.remove("open");
+    document.body.style.overflow = "";
+  }
+  function navigateLightbox(dir) {
+    const vis = activeFilter === "all" ? photos : photos.filter(p => p.cat === activeFilter);
+    const ci = vis.findIndex(p => photos.indexOf(p) === currentIndex);
+    const ni = (ci + dir + vis.length) % vis.length;
+    openLightbox(photos.indexOf(vis[ni]));
+  }
+
+  document.getElementById("lbClose").addEventListener("click", closeLightbox);
+  document.getElementById("lbPrev").addEventListener("click", () => navigateLightbox(-1));
+  document.getElementById("lbNext").addEventListener("click", () => navigateLightbox(1));
+  document.getElementById("lightbox").addEventListener("click", (e) => {
+    if (e.target === document.getElementById("lightbox")) closeLightbox();
+  });
+  document.addEventListener("keydown", (e) => {
+    const lb = document.getElementById("lightbox");
+    if (!lb.classList.contains("open")) return;
+    if (e.key === "Escape") closeLightbox();
+    if (e.key === "ArrowLeft") navigateLightbox(-1);
+    if (e.key === "ArrowRight") navigateLightbox(1);
+  });
+</script>
+
+</body>
+</html>
