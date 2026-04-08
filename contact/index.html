@@ -7,11 +7,11 @@
   <meta name="description" content="Get in touch with TevezuMedia. Boston-based photographer available for portraits, events, weddings, sports, and basketball mixtapes. Response within 24 hours." />
   <meta property="og:title" content="Contact — TevezuMedia" />
   <meta property="og:description" content="Book a session with TevezuMedia. Boston photographer — response within 24 hours." />
-  <meta property="og:image" content="https://schail-ops.github.io/tevezu-media/images/featured-1.jpg" />
-  <meta property="og:url" content="https://schail-ops.github.io/tevezu-media/contact.html" />
+  <meta property="og:image" content="https://tevezu.com/images/featured-1.jpg" />
+  <meta property="og:url" content="https://tevezu.com/contact" />
   <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:image" content="https://schail-ops.github.io/tevezu-media/images/featured-1.jpg" />
+  <meta name="twitter:image" content="https://tevezu.com/images/featured-1.jpg" />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -48,12 +48,12 @@
     .photo-parallax-wrap::before { content:''; position:absolute; top:16px; left:16px; right:-16px; bottom:-16px; border:1px solid var(--brown-pale); border-radius:2px; z-index:0; transition:top 0.4s, left 0.4s; }
     .photo-parallax-wrap:hover::before { top:20px; left:20px; }
     .photo-parallax-inner { width:100%; aspect-ratio:3/4; overflow:hidden; position:relative; z-index:1; border-radius:2px; }
-    .photo-parallax-inner img { width:100%; height:115%; object-fit:cover; display:block; transform:translateY(0); will-change:transform; filter:sepia(8%) contrast(1.02); transition:filter 0.4s; }
+    .photo-parallax-inner img { width:100%; height:115%; object-fit:cover; display:block; will-change:transform; filter:sepia(8%) contrast(1.02); transition:filter 0.4s; }
     .photo-parallax-wrap:hover .photo-parallax-inner img { filter:sepia(0%) contrast(1.04); }
     .photo-placeholder { width:100%; aspect-ratio:3/4; background:var(--cream-3); border-radius:2px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; position:relative; z-index:1; border:1px dashed var(--border); }
     .photo-placeholder svg { width:22px; height:22px; stroke:var(--brown-pale); fill:none; stroke-width:1.5; }
     .photo-placeholder span { font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted-2); }
-    .photo-caption { margin-top:1rem; font-size:12px; font-weight:300; color:var(--muted-2); font-style:italic; padding-left:2px; }
+    .photo-caption { margin-top:1rem; font-size:12px; font-weight:300; color:var(--muted-2); font-style:italic; }
     .story-label { font-size:11px; font-weight:400; letter-spacing:0.2em; text-transform:uppercase; color:var(--brown-pale); margin-bottom:1rem; }
     .story-title { font-family:'Cormorant Garamond',serif; font-size:clamp(28px,4vw,40px); font-weight:300; color:var(--ink); line-height:1.15; margin-bottom:1.75rem; }
     .story-title em { font-style:italic; color:var(--brown); }
@@ -120,10 +120,10 @@
   <nav id="mainNav">
     <a class="nav-brand" href="https://tevezu.com" target="_blank">TevezuMedia</a>
     <div class="nav-links">
-      <a href="index.html" class="page-link">Home</a>
-      <a href="gallery.html" class="page-link">Gallery</a>
-      <a href="pricing.html" class="page-link">Pricing</a>
-      <a href="contact.html" class="active">Contact</a>
+      <a href="../" class="page-link">Home</a>
+      <a href="../gallery/" class="page-link">Gallery</a>
+      <a href="../pricing/" class="page-link">Pricing</a>
+      <a href="../contact/" class="active">Contact</a>
     </div>
   </nav>
 
@@ -136,7 +136,7 @@
     <div class="reveal">
       <div class="photo-parallax-wrap">
         <div class="photo-parallax-inner">
-          <img src="images/me.jpg" alt="Tevez — TevezuMedia" id="parallaxPhoto"
+          <img src="../images/me.jpg" alt="Tevez — TevezuMedia" id="parallaxPhoto"
             onerror="this.style.display='none'; document.getElementById('photoPlaceholder').style.display='flex';" />
           <div id="photoPlaceholder" class="photo-placeholder" style="display:none">
             <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
@@ -166,7 +166,7 @@
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
           @tevezumedia
         </a>
-        <a href="mailto:schailtevez@gmail.com" class="social-link">
+        <a href="/cdn-cgi/l/email-protection#7300101b121a1f071605160933141e121a1f5d101c1e" class="social-link">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 7 10-7"/></svg>
           Email me
         </a>
@@ -183,7 +183,7 @@
         <div class="contact-details">
           <div class="contact-detail">
             <div class="detail-icon"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
-            <div><div class="detail-label">Email</div><div class="detail-value"><a href="mailto:schailtevez@gmail.com">schailtevez@gmail.com</a></div></div>
+            <div><div class="detail-label">Email</div><div class="detail-value"><a href="/cdn-cgi/l/email-protection#b0c3d3d8d1d9dcc4d5c6d5caf0d7ddd1d9dc9ed3dfdd"><span class="__cf_email__" data-cfemail="f88b9b909991948c9d8e9d82b89f95999194d69b9795">[email&#160;protected]</span></a></div></div>
           </div>
           <div class="contact-detail">
             <div class="detail-icon"><svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></div>
@@ -237,29 +237,28 @@
   <footer class="reveal">
     <div class="footer-inner">
       <div>
-        <a href="index.html" class="footer-brand">TevezuMedia</a>
+        <a href="../" class="footer-brand">TevezuMedia</a>
         <div class="footer-tagline">Boston-based photography</div>
       </div>
       <div class="footer-col">
         <div class="footer-col-label">Pages</div>
-        <a href="index.html" class="page-link">Home</a>
-        <a href="gallery.html" class="page-link">Gallery</a>
-        <a href="pricing.html" class="page-link">Pricing</a>
-        <a href="contact.html">Contact</a>
+        <a href="../" class="page-link">Home</a>
+        <a href="../gallery/" class="page-link">Gallery</a>
+        <a href="../pricing/" class="page-link">Pricing</a>
+        <a href="../contact/">Contact</a>
       </div>
       <div class="footer-col">
         <div class="footer-col-label">Connect</div>
         <a href="https://instagram.com/tevezumedia" target="_blank">@tevezumedia</a>
-        <a href="mailto:schailtevez@gmail.com">schailtevez@gmail.com</a>
+        <a href="/cdn-cgi/l/email-protection#6f1c0c070e06031b0a190a152f08020e0603410c0002"><span class="__cf_email__" data-cfemail="6b1808030a02071f0e1d0e112b0c060a020745080406">[email&#160;protected]</span></a>
       </div>
     </div>
     <div class="footer-bottom">© 2025 TevezuMedia · Boston, MA · All rights reserved</div>
   </footer>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
   var SHEET_URL = "https://script.google.com/macros/s/AKfycbyUduwO3OwgD-rIJP65y7aomic_qL3dGuLBsgDxZYtfu1wRJqU7rjBXibgMFl6AOqHc/exec";
 
-  /* PHOTO PARALLAX */
   var parallaxPhoto = document.getElementById("parallaxPhoto");
   window.addEventListener("scroll", function() {
     if (!parallaxPhoto || parallaxPhoto.style.display === "none") return;
@@ -270,24 +269,22 @@
     parallaxPhoto.style.transform = "translateY(" + (center * 0.12) + "px)";
   });
 
-  /* COUNT-UP STATS */
-  function countUpStat(el, target, suffix) {
-    var duration = 1200, start = Date.now();
-    function tick() {
-      var p = Math.min(1, (Date.now() - start) / duration);
-      var ease = 1 - Math.pow(1 - p, 3);
-      el.textContent = Math.round(target * ease) + suffix;
-      if (p < 1) requestAnimationFrame(tick);
-    }
-    requestAnimationFrame(tick);
-  }
-
   var statsObs = new IntersectionObserver(function(entries) {
     entries.forEach(function(entry) {
       if (entry.isIntersecting) {
-        countUpStat(document.getElementById("stat0"), 3, "+");
-        countUpStat(document.getElementById("stat1"), 7, "");
-        countUpStat(document.getElementById("stat2"), 24, "hr");
+        function countUp(el, target, suffix) {
+          var dur = 1200, start = Date.now();
+          function tick() {
+            var p = Math.min(1, (Date.now() - start) / dur);
+            var ease = 1 - Math.pow(1 - p, 3);
+            el.textContent = Math.round(target * ease) + suffix;
+            if (p < 1) requestAnimationFrame(tick);
+          }
+          requestAnimationFrame(tick);
+        }
+        countUp(document.getElementById("stat0"), 3, "+");
+        countUp(document.getElementById("stat1"), 7, "");
+        countUp(document.getElementById("stat2"), 24, "hr");
         statsObs.unobserve(entry.target);
       }
     });
@@ -295,7 +292,6 @@
   var statsGrid = document.getElementById("statsGrid");
   if (statsGrid) statsObs.observe(statsGrid);
 
-  /* FORM */
   function sendMessage() {
     var fname = document.getElementById("fname").value.trim();
     var email = document.getElementById("email").value.trim();
@@ -303,16 +299,13 @@
     var btn = document.getElementById("submitBtn");
     btn.textContent = "Sending..."; btn.disabled = true;
     fetch(SHEET_URL, {
-      method: "POST", mode: "no-cors",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({
-        fname: fname,
-        lname: document.getElementById("lname").value.trim(),
-        email: email,
-        phone: document.getElementById("phone").value.trim(),
-        package: document.getElementById("interest").value,
-        notes: document.getElementById("message").value.trim(),
-        date: ""
+      method:"POST", mode:"no-cors",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        fname:fname, lname:document.getElementById("lname").value.trim(),
+        email:email, phone:document.getElementById("phone").value.trim(),
+        package:document.getElementById("interest").value,
+        notes:document.getElementById("message").value.trim(), date:""
       })
     }).then(function() {
       document.getElementById("contactForm").style.display = "none";
@@ -324,27 +317,24 @@
     });
   }
 
-  /* SCROLL PROGRESS + NAV SHRINK */
   window.addEventListener("scroll", function() {
     var pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
     document.getElementById("progressBar").style.width = Math.min(100, pct) + "%";
     document.getElementById("mainNav").classList.toggle("scrolled", window.scrollY > 60);
   });
 
-  /* SCROLL REVEAL */
   var revealObs = new IntersectionObserver(function(entries) {
     entries.forEach(function(e) {
       if (e.isIntersecting) { e.target.classList.add("visible"); revealObs.unobserve(e.target); }
     });
-  }, {threshold: 0.1});
+  }, {threshold:0.1});
   document.querySelectorAll(".reveal").forEach(function(el) { revealObs.observe(el); });
 
-  /* PAGE TRANSITIONS */
   var pt = document.getElementById("pageTransition");
   document.querySelectorAll(".page-link").forEach(function(link) {
     link.addEventListener("click", function(e) {
       var href = link.getAttribute("href");
-      if (!href || href.startsWith("http") || href.startsWith("#")) return;
+      if (!href || href.startsWith("http") || href.startsWith("#") || href.startsWith("mailto")) return;
       e.preventDefault();
       pt.classList.add("leaving");
       setTimeout(function() { window.location.href = href; }, 460);
