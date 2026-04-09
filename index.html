@@ -133,6 +133,12 @@
     .cf-icon svg { width:16px; height:16px; stroke:var(--brown-pale); }
     .cf-title { font-size:14px; font-weight:400; color:rgba(250,245,239,0.8); margin-bottom:3px; }
     .cf-sub { font-size:12px; font-weight:300; color:rgba(250,245,239,0.35); }
+    .logo-cover { border-top:1px solid var(--border); padding:2.5rem; display:flex; align-items:center; justify-content:center; background:var(--bg); }
+    .logo-stamp { height:64px; width:auto; object-fit:contain; opacity:0.85; transition:opacity 0.2s; filter:sepia(20%) contrast(1.05); }
+    .logo-stamp:hover { opacity:1; }
+    .logo-placeholder { display:flex; flex-direction:column; align-items:center; gap:8px; color:var(--muted-2); }
+    .logo-placeholder svg { stroke:var(--border); }
+    .logo-placeholder span { font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted-2); }
     footer { border-top:1px solid var(--border); padding:3rem 2.5rem 2rem; }
     .footer-inner { max-width:1100px; margin:0 auto; display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:2rem; padding-bottom:2rem; }
     .footer-brand { font-family:'Cormorant Garamond',serif; font-size:20px; letter-spacing:0.14em; text-transform:uppercase; color:var(--brown); margin-bottom:6px; display:block; text-decoration:none; transition:color 0.2s; }
@@ -397,6 +403,16 @@
           </div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- LOGO COVER -->
+  <div class="logo-cover">
+    <img src="/images/cover.png" alt="TevezuMedia" class="logo-stamp"
+      onerror="this.style.display='none'; document.getElementById('logoPlaceholder').style.display='flex';" />
+    <div id="logoPlaceholder" class="logo-placeholder" style="display:none">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      <span>Upload images/cover.png</span>
     </div>
   </div>
 
