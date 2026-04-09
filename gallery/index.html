@@ -90,7 +90,43 @@
     .zoom-level { text-align:center; font-size:10px; letter-spacing:0.08em; color:rgba(201,168,130,0.35); font-family:'DM Sans',sans-serif; margin-top:2px; }
     .drag-hint { position:fixed; bottom:1.5rem; left:50%; transform:translateX(-50%); font-size:11px; letter-spacing:0.16em; text-transform:uppercase; color:rgba(201,168,130,0.4); pointer-events:none; white-space:nowrap; animation:hintFade 5s 2s ease forwards; opacity:0; }
     @keyframes hintFade { 0%{opacity:0;transform:translateX(-50%) translateY(8px)} 15%{opacity:1;transform:translateX(-50%) translateY(0)} 75%{opacity:1} 100%{opacity:0} }
-    @media (max-width:600px) { nav{padding:0.9rem 1.25rem;} .filter-bar{top:56px;padding:0.5rem 1.25rem;} .canvas-wrap{top:100px;} .nav-links a{display:none;} .nav-links a:last-child{display:block;} .filter-hint{display:none;} }
+
+    /* VIEW TOGGLE BUTTON */
+    .view-toggle { margin-left:8px; display:flex; gap:6px; align-items:center; }
+    .view-btn { padding:5px 14px; border-radius:2px; font-size:11px; font-weight:400; letter-spacing:0.08em; text-transform:uppercase; cursor:pointer; border:1px solid rgba(201,168,130,0.25); background:transparent; color:rgba(201,168,130,0.5); font-family:'DM Sans',sans-serif; transition:all 0.18s; display:flex; align-items:center; gap:6px; }
+    .view-btn svg { width:13px; height:13px; stroke:currentColor; fill:none; stroke-width:1.5; flex-shrink:0; }
+    .view-btn.active { background:var(--brown); color:var(--cream); border-color:var(--brown); }
+    .view-btn:hover:not(.active) { border-color:var(--brown-pale); color:var(--brown-pale); background:rgba(124,92,62,0.12); }
+
+    /* GRID VIEW */
+    #gridView {
+      display:none; position:fixed; top:108px; left:0; right:0; bottom:0;
+      overflow-y:auto; z-index:2; background:#0E0804;
+      padding:2rem;
+    }
+    #gridView.active { display:block; }
+    .grid-masonry {
+      columns:4; column-gap:10px; max-width:1200px; margin:0 auto;
+    }
+    .grid-item {
+      break-inside:avoid; margin-bottom:10px;
+      overflow:hidden; border-radius:2px; cursor:pointer;
+      position:relative; background:rgba(124,92,62,0.1);
+      transition:transform 0.3s, box-shadow 0.3s;
+    }
+    .grid-item:hover { transform:translateY(-3px); box-shadow:0 12px 36px rgba(0,0,0,0.5); }
+    .grid-item img { width:100%; display:block; transition:transform 0.5s cubic-bezier(0.25,0.46,0.45,0.94); }
+    .grid-item:hover img { transform:scale(1.04); }
+    .grid-overlay { position:absolute; inset:0; background:rgba(30,18,8,0); transition:background 0.3s; display:flex; align-items:flex-end; padding:0.75rem; }
+    .grid-item:hover .grid-overlay { background:rgba(30,18,8,0.4); }
+    .grid-cat { font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:rgba(250,245,239,0.85); opacity:0; transform:translateY(6px); transition:opacity 0.3s, transform 0.3s; }
+    .grid-item:hover .grid-cat { opacity:1; transform:translateY(0); }
+    .grid-placeholder { width:100%; aspect-ratio:1; background:rgba(124,92,62,0.15); display:flex; align-items:center; justify-content:center; }
+    .grid-placeholder span { font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:rgba(201,168,130,0.4); }
+    .grid-item.hidden { display:none; }
+
+    @media (max-width:900px) { .grid-masonry{columns:3;} }
+    @media (max-width:600px) { nav{padding:0.9rem 1.25rem;} .filter-bar{top:56px;padding:0.5rem 1.25rem;} .canvas-wrap{top:100px;} #gridView{top:100px;} .nav-links a{display:none;} .nav-links a:last-child{display:block;} .filter-hint{display:none;} .grid-masonry{columns:2;} }
   </style>
 </head>
 <body>
@@ -119,6 +155,16 @@
     <button class="filter-btn" data-filter="sports">Sports</button>
     <button class="filter-btn" data-filter="mixtapes">Mixtapes</button>
     <div class="filter-hint">Drag to explore · Click to open</div>
+    <div class="view-toggle">
+      <button class="view-btn active" id="btnGalaxy" title="Galaxy view">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="5" cy="6" r="2"/><circle cx="19" cy="5" r="1.5"/><circle cx="4" cy="17" r="1.5"/><circle cx="20" cy="16" r="2"/><circle cx="12" cy="21" r="1"/></svg>
+        Galaxy
+      </button>
+      <button class="view-btn" id="btnGrid" title="Grid view">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Grid
+      </button>
+    </div>
   </div>
 
   <div class="canvas-wrap" id="canvasWrap">
@@ -134,6 +180,11 @@
     <button class="zoom-btn" id="zoomOut" title="Zoom out">−</button>
     <button class="zoom-btn zoom-reset" id="zoomReset" title="Reset view">Reset</button>
     <div class="zoom-level" id="zoomLevel">42%</div>
+  </div>
+
+  <!-- GRID VIEW -->
+  <div id="gridView">
+    <div class="grid-masonry" id="gridMasonry"></div>
   </div>
 
   <div class="lightbox" id="lightbox">
@@ -346,6 +397,7 @@
         if(activeFilter==="all"||node.dataset.cat===activeFilter)node.classList.remove("hidden");
         else node.classList.add("hidden");
       });
+      if(!isGalaxyView) buildGrid(activeFilter);
     });
   });
   var hash=window.location.hash.replace("#","");
@@ -416,6 +468,46 @@
     }
     requestAnimationFrame(animDust);
   })();
+
+  /* VIEW TOGGLE */
+  var isGalaxyView = true;
+
+  function buildGrid(filter) {
+    var masonry = document.getElementById("gridMasonry");
+    masonry.innerHTML = "";
+    var filtered = filter === "all" ? photos : photos.filter(function(p){return p.cat===filter;});
+    filtered.forEach(function(photo, i) {
+      var item = document.createElement("div");
+      item.className = "grid-item";
+      item.dataset.cat = photo.cat;
+      item.innerHTML = '<img src="'+photo.src+'" alt="'+photo.title+'" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';"/><div class="grid-placeholder" style="display:none"><span>'+photo.cat+'</span></div><div class="grid-overlay"><span class="grid-cat">'+photo.cat+'</span></div>';
+      item.addEventListener("click", function() { openLightbox(photos.indexOf(photo)); });
+      masonry.appendChild(item);
+    });
+  }
+
+  document.getElementById("btnGalaxy").addEventListener("click", function() {
+    isGalaxyView = true;
+    document.getElementById("btnGalaxy").classList.add("active");
+    document.getElementById("btnGrid").classList.remove("active");
+    document.getElementById("canvasWrap").style.display = "block";
+    document.getElementById("starCanvas").style.display = "block";
+    document.getElementById("dustCanvas").style.display = "block";
+    document.getElementById("gridView").classList.remove("active");
+    document.querySelectorAll(".zoom-controls").forEach(function(el){el.style.display="flex";});
+  });
+
+  document.getElementById("btnGrid").addEventListener("click", function() {
+    isGalaxyView = false;
+    document.getElementById("btnGrid").classList.add("active");
+    document.getElementById("btnGalaxy").classList.remove("active");
+    document.getElementById("canvasWrap").style.display = "none";
+    document.getElementById("starCanvas").style.display = "none";
+    document.getElementById("dustCanvas").style.display = "none";
+    document.getElementById("gridView").classList.add("active");
+    document.querySelectorAll(".zoom-controls").forEach(function(el){el.style.display="none";});
+    buildGrid(activeFilter);
+  });
 
   /* PAGE TRANSITIONS */
   var pt=document.getElementById("pageTransition");
