@@ -106,12 +106,8 @@
     .client-title em { font-style:italic; color:var(--brown-pale); }
     .client-section .section-label { color:rgba(201,168,130,0.5); }
     .client-sub { font-size:14px; font-weight:300; color:rgba(250,245,239,0.55); line-height:1.75; margin-bottom:1.75rem; }
-    .client-form { display:flex; gap:0; margin-bottom:1rem; }
-    .client-input { flex:1; padding:12px 16px; border:1px solid rgba(201,168,130,0.2); border-right:none; background:rgba(250,245,239,0.06); font-size:13px; font-weight:300; color:var(--cream); outline:none; font-family:'DM Sans',sans-serif; border-radius:0; transition:border-color 0.2s, background 0.2s; }
-    .client-input::placeholder { color:rgba(250,245,239,0.25); }
-    .client-input:focus { border-color:rgba(201,168,130,0.5); background:rgba(250,245,239,0.1); }
-    .client-btn { padding:12px 20px; background:var(--brown); color:var(--cream); border:none; font-size:12px; font-weight:400; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; font-family:'DM Sans',sans-serif; white-space:nowrap; transition:background 0.2s; border-radius:0; }
-    .client-btn:hover { background:var(--brown-light); }
+    .client-btn { display:inline-block; padding:13px 32px; background:var(--brown); color:var(--cream); font-size:12px; font-weight:400; letter-spacing:0.12em; text-transform:uppercase; text-decoration:none; border-radius:2px; transition:background 0.2s, transform 0.15s; margin-bottom:1.25rem; }
+    .client-btn:hover { background:var(--brown-light); transform:translateY(-1px); }
     .client-note { font-size:12px; font-weight:300; color:rgba(250,245,239,0.3); }
     .client-note a { color:rgba(201,168,130,0.6); text-decoration:none; transition:color 0.2s; }
     .client-note a:hover { color:var(--brown-pale); }
@@ -281,11 +277,8 @@
       <div class="client-left">
         <div class="section-label">Already a client?</div>
         <h2 class="client-title">Access your <em>gallery</em></h2>
-        <p class="client-sub">If we've worked together, your photos are ready and waiting. Enter your unique gallery link below or use the password Tevez sent you.</p>
-        <div class="client-form">
-          <input type="text" class="client-input" id="clientSlug" placeholder="Your gallery name (e.g. sarah-james)" />
-          <button class="client-btn" onclick="goToGallery()">Go to my gallery →</button>
-        </div>
+        <p class="client-sub">If we've worked together, your photos are ready and waiting. Click below to access your private gallery.</p>
+        <a href="/clients" class="client-btn page-link">Go to my gallery →</a>
         <div class="client-note">Don't have a link yet? <a href="/contact" class="page-link">Get in touch</a> to book your session.</div>
       </div>
       <div class="client-right">
@@ -391,15 +384,6 @@
     });
   }, {threshold: 0.1});
   document.querySelectorAll(".reveal").forEach(function(el) { revealObs.observe(el); });
-
-  function goToGallery() {
-    var slug = document.getElementById("clientSlug").value.trim().toLowerCase().replace(/\s+/g, "-");
-    if (!slug) { document.getElementById("clientSlug").focus(); return; }
-    window.location.href = "/clients/" + slug;
-  }
-  document.getElementById("clientSlug").addEventListener("keydown", function(e) {
-    if (e.key === "Enter") goToGallery();
-  });
 
   var pt = document.getElementById("pageTransition");
   document.querySelectorAll(".page-link").forEach(function(link) {    link.addEventListener("click", function(e) {
