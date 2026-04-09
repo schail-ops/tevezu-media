@@ -157,7 +157,11 @@
     .toast { position:fixed; bottom:2rem; left:50%; transform:translateX(-50%) translateY(10px); background:var(--ink); color:var(--cream); font-size:12px; letter-spacing:0.06em; padding:10px 20px; border-radius:2px; opacity:0; pointer-events:none; transition:opacity 0.3s, transform 0.3s; white-space:nowrap; z-index:600; }
     .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
-    @media (max-width:900px) { .photo-grid{columns:2;} }
+    /* LOADING */
+    .gallery-loading { text-align:center; padding:5rem 2rem; color:var(--muted-2); }
+    .loading-spinner { width:32px; height:32px; border:1.5px solid var(--border); border-top-color:var(--brown); border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 1rem; }
+    @keyframes spin { to{transform:rotate(360deg)} }
+    .loading-text { font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted-2); }
     @media (max-width:520px) {
       .photo-grid{columns:1;}
       .gallery-header{padding:1rem 1.25rem; flex-direction:column; align-items:flex-start; gap:0.75rem;}
@@ -240,7 +244,12 @@
       </div>
     </div>
 
-    <div class="photo-grid" id="photoGrid"></div>
+    <div class="photo-grid" id="photoGrid">
+      <div class="gallery-loading" id="loadingState">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Loading your photos...</div>
+      </div>
+    </div>
 
     <div class="gallery-footer">
       <div class="footer-brand">TevezuMedia</div>
@@ -297,6 +306,96 @@
       { src: "images/photo-08.jpg", caption: "" },
       { src: "images/photo-09.jpg", caption: "" },
       { src: "images/photo-10.jpg", caption: "" },
+      { src: "images/photo-11.jpg", caption: "" },
+      { src: "images/photo-12.jpg", caption: "" },
+      { src: "images/photo-13.jpg", caption: "" },
+      { src: "images/photo-14.jpg", caption: "" },
+      { src: "images/photo-15.jpg", caption: "" },
+      { src: "images/photo-16.jpg", caption: "" },
+      { src: "images/photo-17.jpg", caption: "" },
+      { src: "images/photo-18.jpg", caption: "" },
+      { src: "images/photo-19.jpg", caption: "" },
+      { src: "images/photo-20.jpg", caption: "" },
+      { src: "images/photo-21.jpg", caption: "" },
+      { src: "images/photo-22.jpg", caption: "" },
+      { src: "images/photo-23.jpg", caption: "" },
+      { src: "images/photo-24.jpg", caption: "" },
+      { src: "images/photo-25.jpg", caption: "" },
+      { src: "images/photo-26.jpg", caption: "" },
+      { src: "images/photo-27.jpg", caption: "" },
+      { src: "images/photo-28.jpg", caption: "" },
+      { src: "images/photo-29.jpg", caption: "" },
+      { src: "images/photo-30.jpg", caption: "" },
+      { src: "images/photo-31.jpg", caption: "" },
+      { src: "images/photo-32.jpg", caption: "" },
+      { src: "images/photo-33.jpg", caption: "" },
+      { src: "images/photo-34.jpg", caption: "" },
+      { src: "images/photo-35.jpg", caption: "" },
+      { src: "images/photo-36.jpg", caption: "" },
+      { src: "images/photo-37.jpg", caption: "" },
+      { src: "images/photo-38.jpg", caption: "" },
+      { src: "images/photo-39.jpg", caption: "" },
+      { src: "images/photo-40.jpg", caption: "" },
+      { src: "images/photo-41.jpg", caption: "" },
+      { src: "images/photo-42.jpg", caption: "" },
+      { src: "images/photo-43.jpg", caption: "" },
+      { src: "images/photo-44.jpg", caption: "" },
+      { src: "images/photo-45.jpg", caption: "" },
+      { src: "images/photo-46.jpg", caption: "" },
+      { src: "images/photo-47.jpg", caption: "" },
+      { src: "images/photo-48.jpg", caption: "" },
+      { src: "images/photo-49.jpg", caption: "" },
+      { src: "images/photo-50.jpg", caption: "" },
+      { src: "images/photo-51.jpg", caption: "" },
+      { src: "images/photo-52.jpg", caption: "" },
+      { src: "images/photo-53.jpg", caption: "" },
+      { src: "images/photo-54.jpg", caption: "" },
+      { src: "images/photo-55.jpg", caption: "" },
+      { src: "images/photo-56.jpg", caption: "" },
+      { src: "images/photo-57.jpg", caption: "" },
+      { src: "images/photo-58.jpg", caption: "" },
+      { src: "images/photo-59.jpg", caption: "" },
+      { src: "images/photo-60.jpg", caption: "" },
+      { src: "images/photo-61.jpg", caption: "" },
+      { src: "images/photo-62.jpg", caption: "" },
+      { src: "images/photo-63.jpg", caption: "" },
+      { src: "images/photo-64.jpg", caption: "" },
+      { src: "images/photo-65.jpg", caption: "" },
+      { src: "images/photo-66.jpg", caption: "" },
+      { src: "images/photo-67.jpg", caption: "" },
+      { src: "images/photo-68.jpg", caption: "" },
+      { src: "images/photo-69.jpg", caption: "" },
+      { src: "images/photo-70.jpg", caption: "" },
+      { src: "images/photo-71.jpg", caption: "" },
+      { src: "images/photo-72.jpg", caption: "" },
+      { src: "images/photo-73.jpg", caption: "" },
+      { src: "images/photo-74.jpg", caption: "" },
+      { src: "images/photo-75.jpg", caption: "" },
+      { src: "images/photo-76.jpg", caption: "" },
+      { src: "images/photo-77.jpg", caption: "" },
+      { src: "images/photo-78.jpg", caption: "" },
+      { src: "images/photo-79.jpg", caption: "" },
+      { src: "images/photo-80.jpg", caption: "" },
+      { src: "images/photo-81.jpg", caption: "" },
+      { src: "images/photo-82.jpg", caption: "" },
+      { src: "images/photo-83.jpg", caption: "" },
+      { src: "images/photo-84.jpg", caption: "" },
+      { src: "images/photo-85.jpg", caption: "" },
+      { src: "images/photo-86.jpg", caption: "" },
+      { src: "images/photo-87.jpg", caption: "" },
+      { src: "images/photo-88.jpg", caption: "" },
+      { src: "images/photo-89.jpg", caption: "" },
+      { src: "images/photo-90.jpg", caption: "" },
+      { src: "images/photo-91.jpg", caption: "" },
+      { src: "images/photo-92.jpg", caption: "" },
+      { src: "images/photo-93.jpg", caption: "" },
+      { src: "images/photo-94.jpg", caption: "" },
+      { src: "images/photo-95.jpg", caption: "" },
+      { src: "images/photo-96.jpg", caption: "" },
+      { src: "images/photo-97.jpg", caption: "" },
+      { src: "images/photo-98.jpg", caption: "" },
+      { src: "images/photo-99.jpg", caption: "" },
+      { src: "images/photo-100.jpg", caption: "" }
     ]
   };
   /* ============================================================ */
@@ -325,7 +424,6 @@
   /* BUILD GALLERY */
   function buildGallery() {
     document.getElementById("headerClient").textContent = CONFIG.clientName + " — " + CONFIG.sessionType;
-    document.getElementById("photoCount").textContent = CONFIG.photos.length + " photos";
     document.getElementById("introTitle").innerHTML = CONFIG.clientName.split(" ")[0] + "'s <em>" + CONFIG.sessionType + "</em>";
     document.getElementById("introSub").textContent = CONFIG.message;
 
@@ -333,8 +431,7 @@
     var items = [
       {label:"Session", value:CONFIG.sessionType},
       {label:"Date", value:CONFIG.sessionDate},
-      {label:"Location", value:CONFIG.location},
-      {label:"Photos", value:CONFIG.photos.length + " delivered"}
+      {label:"Location", value:CONFIG.location}
     ];
     items.forEach(function(item) {
       var div = document.createElement("div");
@@ -343,32 +440,78 @@
       meta.appendChild(div);
     });
 
+    // Only show photos that actually exist — preload each image
+    // and only add it to the grid if it loads successfully
     var grid = document.getElementById("photoGrid");
     grid.innerHTML = "";
-    CONFIG.photos.forEach(function(photo, i) {
-      var item = document.createElement("div");
-      item.className = "photo-item";
-      item.dataset.index = i;
-      item.innerHTML =
-        '<img src="'+photo.src+'" alt="Photo '+(i+1)+'" loading="lazy" onerror="this.style.display=\'none\';" />' +
-        '<div class="photo-overlay">' +
-          '<div class="overlay-actions">' +
-            '<button class="action-btn btn-fav" data-index="'+i+'" onclick="toggleFav(event,'+i+')" title="Favorite">' +
-              '<svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>' +
-            '</button>' +
-            '<button class="action-btn btn-dl-single" onclick="downloadSingle(event,'+i+')" title="Download">' +
-              '<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' +
-            '</button>' +
+    var validPhotos = [];
+    var checked = 0;
+
+    function tryAdd(photo, originalIndex) {
+      var img = new Image();
+      img.onload = function() {
+        validPhotos.push({photo: photo, idx: originalIndex});
+        finalize();
+      };
+      img.onerror = function() {
+        finalize(); // skip this one silently
+      };
+      img.src = photo.src;
+    }
+
+    function finalize() {
+      checked++;
+      if (checked < CONFIG.photos.length) return;
+
+      // Sort by original index so order stays consistent
+      validPhotos.sort(function(a, b) { return a.idx - b.idx; });
+
+      // Clear loading spinner
+      document.getElementById("photoGrid").innerHTML = "";
+
+      // Update photo count now that we know real count
+      document.getElementById("photoCount").textContent = validPhotos.length + " photo" + (validPhotos.length !== 1 ? "s" : "");
+      var metaDiv = document.createElement("div");
+      metaDiv.className = "meta-item";
+      metaDiv.innerHTML = '<div class="meta-label">Photos</div><div class="meta-value">'+validPhotos.length+' delivered</div>';
+      meta.appendChild(metaDiv);
+
+      // Build a clean re-indexed array so lightbox navigation works
+      var cleanPhotos = validPhotos.map(function(v) { return v.photo; });
+
+      cleanPhotos.forEach(function(photo, i) {
+        var item = document.createElement("div");
+        item.className = "photo-item";
+        item.dataset.index = i;
+        item.innerHTML =
+          '<img src="'+photo.src+'" alt="Photo '+(i+1)+'" loading="lazy" />' +
+          '<div class="photo-overlay">' +
+            '<div class="overlay-actions">' +
+              '<button class="action-btn btn-fav" data-index="'+i+'" onclick="toggleFav(event,'+i+')" title="Favorite">' +
+                '<svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>' +
+              '</button>' +
+              '<button class="action-btn btn-dl-single" onclick="downloadSingle(event,'+i+')" title="Download">' +
+                '<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' +
+              '</button>' +
+            '</div>' +
           '</div>' +
-        '</div>' +
-        '<div class="fav-indicator" id="fav-ind-'+i+'">' +
-          '<svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>' +
-        '</div>';
-      item.addEventListener("click", function(e) {
-        if (e.target.closest(".action-btn")) return;
-        openLightbox(i);
+          '<div class="fav-indicator" id="fav-ind-'+i+'">' +
+            '<svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>' +
+          '</div>';
+        item.addEventListener("click", function(e) {
+          if (e.target.closest(".action-btn")) return;
+          openLightbox(i, cleanPhotos);
+        });
+        grid.appendChild(item);
       });
-      grid.appendChild(item);
+
+      // Store clean photos globally for lightbox/download
+      window._galleryPhotos = cleanPhotos;
+    }
+
+    // Kick off preload checks
+    CONFIG.photos.forEach(function(photo, i) {
+      tryAdd(photo, i);
     });
   }
 
@@ -428,11 +571,12 @@
   }
 
   /* LIGHTBOX */
-  function openLightbox(index) {
+  function openLightbox(index, photos) {
+    var photoList = photos || window._galleryPhotos || CONFIG.photos;
     currentIndex = index;
-    var photo = CONFIG.photos[index];
+    var photo = photoList[index];
     document.getElementById("lbImg").src = photo.src;
-    document.getElementById("lbCounter").textContent = (index+1) + " of " + CONFIG.photos.length;
+    document.getElementById("lbCounter").textContent = (index+1) + " of " + photoList.length;
     var lbFavBtn = document.getElementById("lbFavBtn");
     var lbFavText = document.getElementById("lbFavText");
     if (favorites[index]) { lbFavBtn.classList.add("faved"); lbFavText.textContent = "Favorited"; }
@@ -447,8 +591,9 @@
   }
 
   function navigateLightbox(dir) {
-    currentIndex = (currentIndex + dir + CONFIG.photos.length) % CONFIG.photos.length;
-    openLightbox(currentIndex);
+    var photoList = window._galleryPhotos || CONFIG.photos;
+    currentIndex = (currentIndex + dir + photoList.length) % photoList.length;
+    openLightbox(currentIndex, photoList);
   }
 
   document.getElementById("lbClose").addEventListener("click", closeLightbox);
@@ -468,7 +613,8 @@
   function downloadSingle(eOrIndex, maybeIndex) {
     var index = typeof eOrIndex === "number" ? eOrIndex : maybeIndex;
     if (eOrIndex && eOrIndex.stopPropagation) eOrIndex.stopPropagation();
-    var src = CONFIG.photos[index].src;
+    var photoList = window._galleryPhotos || CONFIG.photos;
+    var src = photoList[index].src;
     var filename = src.split("/").pop();
     var a = document.createElement("a");
     a.href = src; a.download = filename;
@@ -477,8 +623,9 @@
   }
 
   function downloadAll() {
-    showToast("Downloading all " + CONFIG.photos.length + " photos...");
-    CONFIG.photos.forEach(function(photo, i) {
+    var photoList = window._galleryPhotos || CONFIG.photos;
+    showToast("Downloading all " + photoList.length + " photos...");
+    photoList.forEach(function(photo, i) {
       setTimeout(function() {
         var filename = photo.src.split("/").pop();
         var a = document.createElement("a");
@@ -491,10 +638,11 @@
   function downloadFavorites() {
     var favKeys = Object.keys(favorites);
     if (favKeys.length === 0) { showToast("No favorites yet — heart some photos first!"); return; }
+    var photoList = window._galleryPhotos || CONFIG.photos;
     showToast("Downloading " + favKeys.length + " favorited photos...");
     favKeys.forEach(function(key, i) {
       setTimeout(function() {
-        var photo = CONFIG.photos[parseInt(key)];
+        var photo = photoList[parseInt(key)];
         var filename = photo.src.split("/").pop();
         var a = document.createElement("a");
         a.href = photo.src; a.download = filename;
