@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your Gallery — TevezuMedia</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --ink: #1E1208; --brown: #7C5C3E; --brown-light: #A07850;
+      --brown-pale: #C9A882; --border: #DCC9B0;
+      --cream: #FAF5EF; --cream-2: #F5EDE2; --cream-3: #EDE0CF;
+      --bg: #F2E8D9; --muted: #7A6A5A; --muted-2: #9A8070;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; }
+    body::after { content:''; position:fixed; inset:0; z-index:9999; pointer-events:none; opacity:0.032; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E"); background-size:180px; animation:grain 0.4s steps(1) infinite; }
+    @keyframes grain { 0%{background-position:0 0} 25%{background-position:-30px 20px} 50%{background-position:20px -15px} 75%{background-position:-10px 30px} 100%{background-position:15px -5px} }
+
+    /* PASSWORD SCREEN */
+    #passwordScreen {
+      position:fixed; inset:0; z-index:500;
+      background:var(--bg);
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      padding:2rem; text-align:center;
+    }
+    #passwordScreen.hidden { display:none; }
+    .lock-brand { font-family:'Cormorant Garamond',serif; font-size:20px; letter-spacing:0.14em; text-transform:uppercase; color:var(--brown); margin-bottom:3rem; }
+    .lock-icon { width:48px; height:48px; border:1px solid var(--border); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 1.5rem; }
+    .lock-icon svg { width:20px; height:20px; stroke:var(--brown); fill:none; stroke-width:1.5; }
+    .lock-title { font-family:'Cormorant Garamond',serif; font-size:clamp(28px,5vw,42px); font-weight:300; color:var(--ink); margin-bottom:0.5rem; }
+    .lock-title em { font-style:italic; color:var(--brown); }
+    .lock-sub { font-size:13px; font-weight:300; color:var(--muted); margin-bottom:2rem; line-height:1.6; }
+    .lock-form { display:flex; flex-direction:column; gap:10px; width:100%; max-width:320px; }
+    .lock-input { padding:12px 16px; border:1px solid var(--border); border-radius:0; background:var(--cream); font-size:14px; font-weight:300; color:var(--ink); outline:none; font-family:'DM Sans',sans-serif; text-align:center; letter-spacing:0.1em; transition:border-color 0.2s, box-shadow 0.2s; }
+    .lock-input:focus { border-color:var(--brown); box-shadow:0 0 0 3px rgba(124,92,62,0.1); }
+    .lock-btn { padding:12px; background:var(--brown); color:var(--cream); border:none; font-size:12px; font-weight:400; letter-spacing:0.14em; text-transform:uppercase; cursor:pointer; font-family:'DM Sans',sans-serif; transition:background 0.2s; }
+    .lock-btn:hover { background:var(--ink); }
+    .lock-error { font-size:12px; color:#A32D2D; display:none; }
+    .lock-error.visible { display:block; }
+
+    /* MAIN GALLERY */
+    #galleryScreen { display:none; }
+    #galleryScreen.visible { display:block; }
+
+    /* HEADER */
+    .gallery-header {
+      border-bottom:1px solid var(--border);
+      background:rgba(242,232,217,0.92);
+      backdrop-filter:blur(12px);
+      position:sticky; top:0; z-index:100;
+      padding:1.25rem 2.5rem;
+      display:flex; align-items:center; justify-content:space-between;
+      flex-wrap:wrap; gap:1rem;
+    }
+    .header-left {}
+    .header-brand { font-family:'Cormorant Garamond',serif; font-size:20px; letter-spacing:0.14em; text-transform:uppercase; color:var(--brown); display:block; text-decoration:none; }
+    .header-client { font-size:12px; font-weight:300; color:var(--muted); margin-top:2px; }
+    .header-right { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    .photo-count { font-size:12px; font-weight:300; color:var(--muted-2); font-style:italic; }
+    .fav-count-wrap { font-size:12px; font-weight:300; color:var(--brown); display:none; }
+    .fav-count-wrap.visible { display:block; }
+    .btn-dl-all { padding:9px 20px; background:var(--brown); color:var(--cream); border:none; font-size:11px; font-weight:400; letter-spacing:0.12em; text-transform:uppercase; cursor:pointer; font-family:'DM Sans',sans-serif; border-radius:2px; transition:background 0.2s, transform 0.15s; display:flex; align-items:center; gap:7px; }
+    .btn-dl-all:hover { background:var(--ink); transform:translateY(-1px); }
+    .btn-dl-all svg { width:13px; height:13px; stroke:currentColor; fill:none; stroke-width:1.5; }
+    .btn-dl-favs { padding:9px 20px; background:transparent; color:var(--brown); border:1px solid var(--border); font-size:11px; font-weight:400; letter-spacing:0.12em; text-transform:uppercase; cursor:pointer; font-family:'DM Sans',sans-serif; border-radius:2px; transition:all 0.2s; display:none; align-items:center; gap:7px; }
+    .btn-dl-favs.visible { display:flex; }
+    .btn-dl-favs:hover { background:var(--cream-2); border-color:var(--brown-pale); transform:translateY(-1px); }
+    .btn-dl-favs svg { width:13px; height:13px; stroke:currentColor; fill:none; stroke-width:1.5; }
+
+    /* GALLERY INTRO */
+    .gallery-intro { max-width:1200px; margin:0 auto; padding:3rem 2rem 1rem; }
+    .intro-title { font-family:'Cormorant Garamond',serif; font-size:clamp(32px,5vw,52px); font-weight:300; color:var(--ink); line-height:1.1; margin-bottom:0.5rem; }
+    .intro-title em { font-style:italic; color:var(--brown); }
+    .intro-sub { font-size:14px; font-weight:300; color:var(--muted); line-height:1.7; max-width:520px; }
+    .intro-meta { display:flex; gap:2rem; margin-top:1.5rem; flex-wrap:wrap; }
+    .meta-item { display:flex; flex-direction:column; gap:3px; }
+    .meta-label { font-size:10px; letter-spacing:0.16em; text-transform:uppercase; color:var(--muted-2); }
+    .meta-value { font-size:14px; font-weight:300; color:var(--ink); }
+
+    .divider { height:1px; background:var(--border); max-width:1200px; margin:2rem auto 0; }
+
+    /* TIPS BAR */
+    .tips-bar { max-width:1200px; margin:1.25rem auto 0; padding:0 2rem; display:flex; gap:2rem; flex-wrap:wrap; }
+    .tip { font-size:12px; font-weight:300; color:var(--muted-2); display:flex; align-items:center; gap:6px; }
+    .tip svg { width:14px; height:14px; stroke:var(--brown-pale); fill:none; stroke-width:1.5; flex-shrink:0; }
+
+    /* MASONRY GRID */
+    .photo-grid { max-width:1200px; margin:2rem auto 5rem; padding:0 2rem; columns:3; column-gap:12px; }
+    .photo-item { break-inside:avoid; margin-bottom:12px; position:relative; border-radius:2px; overflow:hidden; background:var(--cream-3); cursor:pointer; }
+    .photo-item img { width:100%; display:block; transition:transform 0.5s cubic-bezier(0.25,0.46,0.45,0.94); }
+    .photo-item:hover img { transform:scale(1.04); }
+
+    /* PHOTO OVERLAY */
+    .photo-overlay {
+      position:absolute; inset:0;
+      background:rgba(30,18,8,0);
+      transition:background 0.3s;
+      display:flex; align-items:flex-end;
+      padding:0.75rem;
+    }
+    .photo-item:hover .photo-overlay { background:rgba(30,18,8,0.35); }
+    .overlay-actions { display:flex; gap:6px; opacity:0; transform:translateY(8px); transition:opacity 0.3s, transform 0.3s; }
+    .photo-item:hover .overlay-actions { opacity:1; transform:translateY(0); }
+    .action-btn {
+      width:34px; height:34px; border-radius:2px; border:none; cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+      transition:background 0.15s, transform 0.15s;
+      backdrop-filter:blur(8px);
+    }
+    .action-btn svg { width:15px; height:15px; stroke:var(--cream); fill:none; stroke-width:1.5; pointer-events:none; }
+    .btn-fav { background:rgba(30,18,8,0.5); }
+    .btn-fav:hover { background:rgba(124,92,62,0.8); transform:scale(1.08); }
+    .btn-fav.faved { background:var(--brown); }
+    .btn-fav.faved svg { stroke:var(--cream); fill:var(--cream); }
+    .btn-dl-single { background:rgba(30,18,8,0.5); }
+    .btn-dl-single:hover { background:rgba(30,18,8,0.8); transform:scale(1.08); }
+
+    /* FAV INDICATOR */
+    .fav-indicator { position:absolute; top:10px; right:10px; width:28px; height:28px; background:var(--brown); border-radius:50%; display:none; align-items:center; justify-content:center; }
+    .fav-indicator.visible { display:flex; }
+    .fav-indicator svg { width:12px; height:12px; stroke:var(--cream); fill:var(--cream); stroke-width:1.5; }
+
+    /* LIGHTBOX */
+    .lightbox { position:fixed; inset:0; z-index:400; background:rgba(14,8,2,0.97); display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity 0.35s; }
+    .lightbox.open { opacity:1; pointer-events:all; }
+    .lb-img-wrap { position:relative; transform:scale(0.88); transition:transform 0.4s cubic-bezier(0.16,1,0.3,1); }
+    .lightbox.open .lb-img-wrap { transform:scale(1); }
+    .lb-img { max-width:88vw; max-height:80vh; object-fit:contain; display:block; border-radius:2px; }
+    .lb-close { position:fixed; top:1.5rem; right:2rem; background:none; border:none; font-size:24px; color:rgba(250,245,239,0.5); cursor:pointer; transition:color 0.2s; font-family:sans-serif; z-index:10; }
+    .lb-close:hover { color:var(--cream); }
+    .lb-nav { position:fixed; top:50%; transform:translateY(-50%); background:none; border:1px solid rgba(250,245,239,0.15); color:rgba(250,245,239,0.4); width:42px; height:42px; border-radius:2px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:16px; transition:all 0.2s; }
+    .lb-nav:hover { border-color:rgba(250,245,239,0.4); color:var(--cream); }
+    .lb-prev { left:1.5rem; }
+    .lb-next { right:1.5rem; }
+    .lb-actions { position:fixed; bottom:2rem; left:0; right:0; display:flex; justify-content:center; gap:10px; }
+    .lb-action-btn { padding:9px 22px; font-size:11px; font-weight:400; letter-spacing:0.12em; text-transform:uppercase; cursor:pointer; font-family:'DM Sans',sans-serif; border-radius:2px; display:flex; align-items:center; gap:7px; transition:all 0.2s; }
+    .lb-action-btn svg { width:13px; height:13px; stroke:currentColor; fill:none; stroke-width:1.5; }
+    .lb-fav-btn { background:rgba(124,92,62,0.3); color:rgba(250,245,239,0.7); border:1px solid rgba(201,168,130,0.2); }
+    .lb-fav-btn:hover { background:var(--brown); color:var(--cream); border-color:var(--brown); }
+    .lb-fav-btn.faved { background:var(--brown); color:var(--cream); border-color:var(--brown); }
+    .lb-dl-btn { background:rgba(30,18,8,0.5); color:rgba(250,245,239,0.7); border:1px solid rgba(250,245,239,0.15); }
+    .lb-dl-btn:hover { background:rgba(30,18,8,0.8); color:var(--cream); border-color:rgba(250,245,239,0.3); }
+    .lb-info { position:fixed; bottom:5.5rem; left:0; right:0; text-align:center; }
+    .lb-counter { font-size:12px; font-weight:300; color:rgba(250,245,239,0.35); letter-spacing:0.06em; }
+
+    /* FOOTER */
+    .gallery-footer { border-top:1px solid var(--border); padding:2rem 2.5rem; text-align:center; }
+    .footer-brand { font-family:'Cormorant Garamond',serif; font-size:17px; letter-spacing:0.14em; text-transform:uppercase; color:var(--brown); margin-bottom:6px; }
+    .footer-sub { font-size:12px; font-weight:300; color:var(--muted-2); margin-bottom:1.25rem; font-style:italic; }
+    .footer-book { display:inline-block; padding:10px 28px; border:1px solid var(--border); color:var(--brown); font-size:11px; letter-spacing:0.12em; text-transform:uppercase; text-decoration:none; border-radius:2px; transition:all 0.2s; }
+    .footer-book:hover { background:var(--brown); color:var(--cream); border-color:var(--brown); }
+
+    /* TOAST */
+    .toast { position:fixed; bottom:2rem; left:50%; transform:translateX(-50%) translateY(10px); background:var(--ink); color:var(--cream); font-size:12px; letter-spacing:0.06em; padding:10px 20px; border-radius:2px; opacity:0; pointer-events:none; transition:opacity 0.3s, transform 0.3s; white-space:nowrap; z-index:600; }
+    .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+    /* LOADING */
+    .gallery-loading { text-align:center; padding:5rem 2rem; color:var(--muted-2); }
+    .loading-spinner { width:32px; height:32px; border:1.5px solid var(--border); border-top-color:var(--brown); border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 1rem; }
+    @keyframes spin { to{transform:rotate(360deg)} }
+    .loading-text { font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted-2); }
+    @media (max-width:520px) {
+      .photo-grid{columns:1;}
+      .gallery-header{padding:1rem 1.25rem; flex-direction:column; align-items:flex-start; gap:0.75rem;}
+      .header-right{width:100%; justify-content:space-between;}
+      .btn-dl-all{padding:8px 14px; font-size:10px;}
+      .btn-dl-favs{padding:8px 14px; font-size:10px;}
+      .gallery-intro{padding:1.5rem 1.25rem 1rem;}
+      .intro-meta{gap:1rem;}
+      .tips-bar{padding:0 1.25rem; gap:1rem;}
+      .tip{font-size:11px;}
+      .photo-grid{padding:0 1.25rem; margin-bottom:3rem;}
+      .gallery-footer{padding:1.5rem 1.25rem;}
+      .lb-nav{display:none;}
+      .lb-actions{flex-direction:column; align-items:center; gap:8px; bottom:1.5rem;}
+      .lb-action-btn{padding:10px 20px;}
+      .lock-title{font-size:28px;}
+      .overlay-actions{opacity:1; transform:translateY(0);}
+    }
+  </style>
+</head>
+<body>
+
+  <!-- PASSWORD SCREEN -->
+  <div id="passwordScreen">
+    <div class="lock-brand">TevezuMedia</div>
+    <div class="lock-icon">
+      <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    </div>
+    <h1 class="lock-title">Your <em>gallery</em> is ready</h1>
+    <p class="lock-sub">Enter the password Tevez sent you<br>to access your photos.</p>
+    <div class="lock-form">
+      <input class="lock-input" id="passwordInput" type="password" placeholder="Enter password" />
+      <button class="lock-btn" onclick="checkPassword()">View my photos</button>
+      <div class="lock-error" id="lockError">Incorrect password. Please try again.</div>
+    </div>
+  </div>
+
+  <!-- GALLERY -->
+  <div id="galleryScreen">
+
+    <div class="gallery-header">
+      <div class="header-left">
+        <a href="https://tevezu.com" class="header-brand" target="_blank">TevezuMedia</a>
+        <div class="header-client" id="headerClient"></div>
+      </div>
+      <div class="header-right">
+        <div class="photo-count" id="photoCount"></div>
+        <div class="fav-count-wrap" id="favCountWrap"></div>
+        <button class="btn-dl-favs" id="btnDlFavs" onclick="downloadFavorites()">
+          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          Download favorites
+        </button>
+        <button class="btn-dl-all" onclick="downloadAll()">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download all
+        </button>
+      </div>
+    </div>
+
+    <div class="gallery-intro">
+      <h1 class="intro-title" id="introTitle"></h1>
+      <p class="intro-sub" id="introSub"></p>
+      <div class="intro-meta" id="introMeta"></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="tips-bar">
+      <div class="tip">
+        <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        Click the heart to favorite photos
+      </div>
+      <div class="tip">
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download individually or all at once
+      </div>
+      <div class="tip">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        Click any photo to view full size
+      </div>
+    </div>
+
+    <div class="photo-grid" id="photoGrid">
+      <div class="gallery-loading" id="loadingState">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Loading your photos...</div>
+      </div>
+    </div>
+
+    <div class="gallery-footer">
+      <div class="footer-brand">TevezuMedia</div>
+      <div class="footer-sub">Thank you for trusting me to capture your moments.</div>
+      <a href="https://tevezu.com/pricing" class="footer-book" target="_blank">Book another session →</a>
+    </div>
+
+  </div>
+
+  <!-- LIGHTBOX -->
+  <div class="lightbox" id="lightbox">
+    <button class="lb-close" id="lbClose">&#x2715;</button>
+    <button class="lb-nav lb-prev" id="lbPrev">&#8592;</button>
+    <div class="lb-img-wrap"><img class="lb-img" id="lbImg" src="" alt="" /></div>
+    <button class="lb-nav lb-next" id="lbNext">&#8594;</button>
+    <div class="lb-info"><div class="lb-counter" id="lbCounter"></div></div>
+    <div class="lb-actions">
+      <button class="lb-action-btn lb-fav-btn" id="lbFavBtn" onclick="toggleFavFromLb()">
+        <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        <span id="lbFavText">Add to favorites</span>
+      </button>
+      <button class="lb-action-btn lb-dl-btn" id="lbDlBtn" onclick="downloadSingle(currentIndex)">
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download this photo
+      </button>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+<script>
+  /* ============================================================
+     CONFIGURATION — edit this for each client
+     ============================================================ */
+  var CONFIG = {
+    password:    "tevezu123",          // change per client
+    clientName:  "Sarah & James",      // client name
+    sessionType: "Wedding Day",        // type of session
+    sessionDate: "June 14, 2025",      // date of session
+    location:    "Boston, MA",         // location
+    message:     "Here are your photos from your special day. Take your time browsing — heart your favorites so I know which ones mean the most to you.",
+
+    // ADD YOUR PHOTOS HERE
+    // Format: { src: "images/photo-name.jpg", caption: "optional caption" }
+    photos: [
+      { src: "images/photo-1.jpg", caption: "" },
+      { src: "images/photo-2.jpg", caption: "" },
+      { src: "images/photo-3.jpg", caption: "" },
+      { src: "images/photo-4.jpg", caption: "" },
+      { src: "images/photo-5.jpg", caption: "" },
+      { src: "images/photo-6.jpg", caption: "" },
+      { src: "images/photo-7.jpg", caption: "" },
+      { src: "images/photo-8.jpg", caption: "" },
+      { src: "images/photo-9.jpg", caption: "" },
+      { src: "images/photo-10.jpg", caption: "" },
+      { src: "images/photo-11.jpg", caption: "" },
+      { src: "images/photo-12.jpg", caption: "" },
+      { src: "images/photo-13.jpg", caption: "" },
+      { src: "images/photo-14.jpg", caption: "" },
+      { src: "images/photo-15.jpg", caption: "" },
+      { src: "images/photo-16.jpg", caption: "" },
+      { src: "images/photo-17.jpg", caption: "" },
+      { src: "images/photo-18.jpg", caption: "" },
+      { src: "images/photo-19.jpg", caption: "" },
+      { src: "images/photo-20.jpg", caption: "" },
+      { src: "images/photo-21.jpg", caption: "" },
+      { src: "images/photo-22.jpg", caption: "" },
+      { src: "images/photo-23.jpg", caption: "" },
+      { src: "images/photo-24.jpg", caption: "" },
+      { src: "images/photo-25.jpg", caption: "" },
+      { src: "images/photo-26.jpg", caption: "" },
+      { src: "images/photo-27.jpg", caption: "" },
+      { src: "images/photo-28.jpg", caption: "" },
+      { src: "images/photo-29.jpg", caption: "" },
+      { src: "images/photo-30.jpg", caption: "" },
+      { src: "images/photo-31.jpg", caption: "" },
+      { src: "images/photo-32.jpg", caption: "" },
+      { src: "images/photo-33.jpg", caption: "" },
+      { src: "images/photo-34.jpg", caption: "" },
+      { src: "images/photo-35.jpg", caption: "" },
+      { src: "images/photo-36.jpg", caption: "" },
+      { src: "images/photo-37.jpg", caption: "" },
+      { src: "images/photo-38.jpg", caption: "" },
+      { src: "images/photo-39.jpg", caption: "" },
+      { src: "images/photo-40.jpg", caption: "" },
+      { src: "images/photo-41.jpg", caption: "" },
+      { src: "images/photo-42.jpg", caption: "" },
+      { src: "images/photo-43.jpg", caption: "" },
+      { src: "images/photo-44.jpg", caption: "" },
+      { src: "images/photo-45.jpg", caption: "" },
+      { src: "images/photo-46.jpg", caption: "" },
+      { src: "images/photo-47.jpg", caption: "" },
+      { src: "images/photo-48.jpg", caption: "" },
+      { src: "images/photo-49.jpg", caption: "" },
+      { src: "images/photo-50.jpg", caption: "" },
+      { src: "images/photo-51.jpg", caption: "" },
+      { src: "images/photo-52.jpg", caption: "" },
+      { src: "images/photo-53.jpg", caption: "" },
+      { src: "images/photo-54.jpg", caption: "" },
+      { src: "images/photo-55.jpg", caption: "" },
+      { src: "images/photo-56.jpg", caption: "" },
+      { src: "images/photo-57.jpg", caption: "" },
+      { src: "images/photo-58.jpg", caption: "" },
+      { src: "images/photo-59.jpg", caption: "" },
+      { src: "images/photo-60.jpg", caption: "" },
+      { src: "images/photo-61.jpg", caption: "" },
+      { src: "images/photo-62.jpg", caption: "" },
+      { src: "images/photo-63.jpg", caption: "" },
+      { src: "images/photo-64.jpg", caption: "" },
+      { src: "images/photo-65.jpg", caption: "" },
+      { src: "images/photo-66.jpg", caption: "" },
+      { src: "images/photo-67.jpg", caption: "" },
+      { src: "images/photo-68.jpg", caption: "" },
+      { src: "images/photo-69.jpg", caption: "" },
+      { src: "images/photo-70.jpg", caption: "" },
+      { src: "images/photo-71.jpg", caption: "" },
+      { src: "images/photo-72.jpg", caption: "" },
+      { src: "images/photo-73.jpg", caption: "" },
+      { src: "images/photo-74.jpg", caption: "" },
+      { src: "images/photo-75.jpg", caption: "" },
+      { src: "images/photo-76.jpg", caption: "" },
+      { src: "images/photo-77.jpg", caption: "" },
+      { src: "images/photo-78.jpg", caption: "" },
+      { src: "images/photo-79.jpg", caption: "" },
+      { src: "images/photo-80.jpg", caption: "" },
+      { src: "images/photo-81.jpg", caption: "" },
+      { src: "images/photo-82.jpg", caption: "" },
+      { src: "images/photo-83.jpg", caption: "" },
+      { src: "images/photo-84.jpg", caption: "" },
+      { src: "images/photo-85.jpg", caption: "" },
+      { src: "images/photo-86.jpg", caption: "" },
+      { src: "images/photo-87.jpg", caption: "" },
+      { src: "images/photo-88.jpg", caption: "" },
+      { src: "images/photo-89.jpg", caption: "" },
+      { src: "images/photo-90.jpg", caption: "" },
+      { src: "images/photo-91.jpg", caption: "" },
+      { src: "images/photo-92.jpg", caption: "" },
+      { src: "images/photo-93.jpg", caption: "" },
+      { src: "images/photo-94.jpg", caption: "" },
+      { src: "images/photo-95.jpg", caption: "" },
+      { src: "images/photo-96.jpg", caption: "" },
+      { src: "images/photo-97.jpg", caption: "" },
+      { src: "images/photo-98.jpg", caption: "" },
+      { src: "images/photo-99.jpg", caption: "" },
+      { src: "images/photo-100.jpg", caption: "" },
+      { src: "images/photo-101.jpg", caption: "" },
+      { src: "images/photo-102.jpg", caption: "" },
+      { src: "images/photo-103.jpg", caption: "" },
+      { src: "images/photo-104.jpg", caption: "" },
+      { src: "images/photo-105.jpg", caption: "" },
+      { src: "images/photo-106.jpg", caption: "" },
+      { src: "images/photo-107.jpg", caption: "" },
+      { src: "images/photo-108.jpg", caption: "" },
+      { src: "images/photo-109.jpg", caption: "" },
+      { src: "images/photo-110.jpg", caption: "" },
+      { src: "images/photo-111.jpg", caption: "" },
+      { src: "images/photo-112.jpg", caption: "" },
+      { src: "images/photo-113.jpg", caption: "" },
+      { src: "images/photo-114.jpg", caption: "" },
+      { src: "images/photo-115.jpg", caption: "" },
+      { src: "images/photo-116.jpg", caption: "" },
+      { src: "images/photo-117.jpg", caption: "" },
+      { src: "images/photo-118.jpg", caption: "" },
+      { src: "images/photo-119.jpg", caption: "" },
+      { src: "images/photo-120.jpg", caption: "" },
+      { src: "images/photo-121.jpg", caption: "" },
+      { src: "images/photo-122.jpg", caption: "" },
+      { src: "images/photo-123.jpg", caption: "" },
+      { src: "images/photo-124.jpg", caption: "" },
+      { src: "images/photo-125.jpg", caption: "" },
+      { src: "images/photo-126.jpg", caption: "" },
+      { src: "images/photo-127.jpg", caption: "" },
+      { src: "images/photo-128.jpg", caption: "" },
+      { src: "images/photo-129.jpg", caption: "" },
+      { src: "images/photo-130.jpg", caption: "" },
+      { src: "images/photo-131.jpg", caption: "" },
+      { src: "images/photo-132.jpg", caption: "" },
+      { src: "images/photo-133.jpg", caption: "" },
+      { src: "images/photo-134.jpg", caption: "" },
+      { src: "images/photo-135.jpg", caption: "" },
+      { src: "images/photo-136.jpg", caption: "" },
+      { src: "images/photo-137.jpg", caption: "" },
+      { src: "images/photo-138.jpg", caption: "" },
+      { src: "images/photo-139.jpg", caption: "" },
+      { src: "images/photo-140.jpg", caption: "" },
+      { src: "images/photo-141.jpg", caption: "" },
+      { src: "images/photo-142.jpg", caption: "" },
+      { src: "images/photo-143.jpg", caption: "" },
+      { src: "images/photo-144.jpg", caption: "" },
+      { src: "images/photo-145.jpg", caption: "" },
+      { src: "images/photo-146.jpg", caption: "" },
+      { src: "images/photo-147.jpg", caption: "" },
+      { src: "images/photo-148.jpg", caption: "" },
+      { src: "images/photo-149.jpg", caption: "" },
+      { src: "images/photo-150.jpg", caption: "" },
+      { src: "images/photo-151.jpg", caption: "" },
+      { src: "images/photo-152.jpg", caption: "" },
+      { src: "images/photo-153.jpg", caption: "" },
+      { src: "images/photo-154.jpg", caption: "" },
+      { src: "images/photo-155.jpg", caption: "" },
+      { src: "images/photo-156.jpg", caption: "" },
+      { src: "images/photo-157.jpg", caption: "" },
+      { src: "images/photo-158.jpg", caption: "" },
+      { src: "images/photo-159.jpg", caption: "" },
+      { src: "images/photo-160.jpg", caption: "" },
+      { src: "images/photo-161.jpg", caption: "" },
+      { src: "images/photo-162.jpg", caption: "" },
+      { src: "images/photo-163.jpg", caption: "" },
+      { src: "images/photo-164.jpg", caption: "" },
+      { src: "images/photo-165.jpg", caption: "" },
+      { src: "images/photo-166.jpg", caption: "" },
+      { src: "images/photo-167.jpg", caption: "" },
+      { src: "images/photo-168.jpg", caption: "" },
+      { src: "images/photo-169.jpg", caption: "" },
+      { src: "images/photo-170.jpg", caption: "" },
+      { src: "images/photo-171.jpg", caption: "" },
+      { src: "images/photo-172.jpg", caption: "" },
+      { src: "images/photo-173.jpg", caption: "" },
+      { src: "images/photo-174.jpg", caption: "" },
+      { src: "images/photo-175.jpg", caption: "" },
+      { src: "images/photo-176.jpg", caption: "" },
+      { src: "images/photo-177.jpg", caption: "" },
+      { src: "images/photo-178.jpg", caption: "" },
+      { src: "images/photo-179.jpg", caption: "" },
+      { src: "images/photo-180.jpg", caption: "" },
+      { src: "images/photo-181.jpg", caption: "" },
+      { src: "images/photo-182.jpg", caption: "" },
+      { src: "images/photo-183.jpg", caption: "" },
+      { src: "images/photo-184.jpg", caption: "" },
+      { src: "images/photo-185.jpg", caption: "" },
+      { src: "images/photo-186.jpg", caption: "" },
+      { src: "images/photo-187.jpg", caption: "" },
+      { src: "images/photo-188.jpg", caption: "" },
+      { src: "images/photo-189.jpg", caption: "" },
+      { src: "images/photo-190.jpg", caption: "" },
+      { src: "images/photo-191.jpg", caption: "" },
+      { src: "images/photo-192.jpg", caption: "" },
+      { src: "images/photo-193.jpg", caption: "" },
+      { src: "images/photo-194.jpg", caption: "" },
+      { src: "images/photo-195.jpg", caption: "" },
+      { src: "images/photo-196.jpg", caption: "" },
+      { src: "images/photo-197.jpg", caption: "" },
+      { src: "images/photo-198.jpg", caption: "" },
+      { src: "images/photo-199.jpg", caption: "" },
+      { src: "images/photo-200.jpg", caption: "" },
+      { src: "images/photo-201.jpg", caption: "" },
+      { src: "images/photo-202.jpg", caption: "" },
+      { src: "images/photo-203.jpg", caption: "" },
+      { src: "images/photo-204.jpg", caption: "" },
+      { src: "images/photo-205.jpg", caption: "" },
+      { src: "images/photo-206.jpg", caption: "" },
+      { src: "images/photo-207.jpg", caption: "" },
+      { src: "images/photo-208.jpg", caption: "" },
+      { src: "images/photo-209.jpg", caption: "" },
+      { src: "images/photo-210.jpg", caption: "" },
+      { src: "images/photo-211.jpg", caption: "" },
+      { src: "images/photo-212.jpg", caption: "" },
+      { src: "images/photo-213.jpg", caption: "" },
+      { src: "images/photo-214.jpg", caption: "" },
+      { src: "images/photo-215.jpg", caption: "" },
+      { src: "images/photo-216.jpg", caption: "" },
+      { src: "images/photo-217.jpg", caption: "" },
+      { src: "images/photo-218.jpg", caption: "" },
+      { src: "images/photo-219.jpg", caption: "" },
+      { src: "images/photo-220.jpg", caption: "" },
+      { src: "images/photo-221.jpg", caption: "" },
+      { src: "images/photo-222.jpg", caption: "" },
+      { src: "images/photo-223.jpg", caption: "" },
+      { src: "images/photo-224.jpg", caption: "" },
+      { src: "images/photo-225.jpg", caption: "" },
+      { src: "images/photo-226.jpg", caption: "" },
+      { src: "images/photo-227.jpg", caption: "" },
+      { src: "images/photo-228.jpg", caption: "" },
+      { src: "images/photo-229.jpg", caption: "" },
+      { src: "images/photo-230.jpg", caption: "" },
+      { src: "images/photo-231.jpg", caption: "" },
+      { src: "images/photo-232.jpg", caption: "" },
+      { src: "images/photo-233.jpg", caption: "" },
+      { src: "images/photo-234.jpg", caption: "" },
+      { src: "images/photo-235.jpg", caption: "" },
+      { src: "images/photo-236.jpg", caption: "" },
+      { src: "images/photo-237.jpg", caption: "" },
+      { src: "images/photo-238.jpg", caption: "" },
+      { src: "images/photo-239.jpg", caption: "" },
+      { src: "images/photo-240.jpg", caption: "" },
+      { src: "images/photo-241.jpg", caption: "" },
+      { src: "images/photo-242.jpg", caption: "" },
+      { src: "images/photo-243.jpg", caption: "" },
+      { src: "images/photo-244.jpg", caption: "" },
+      { src: "images/photo-245.jpg", caption: "" },
+      { src: "images/photo-246.jpg", caption: "" },
+      { src: "images/photo-247.jpg", caption: "" },
+      { src: "images/photo-248.jpg", caption: "" },
+      { src: "images/photo-249.jpg", caption: "" },
+      { src: "images/photo-250.jpg", caption: "" },
+      { src: "images/photo-251.jpg", caption: "" },
+      { src: "images/photo-252.jpg", caption: "" },
+      { src: "images/photo-253.jpg", caption: "" },
+      { src: "images/photo-254.jpg", caption: "" },
+      { src: "images/photo-255.jpg", caption: "" },
+      { src: "images/photo-256.jpg", caption: "" },
+      { src: "images/photo-257.jpg", caption: "" },
+      { src: "images/photo-258.jpg", caption: "" },
+      { src: "images/photo-259.jpg", caption: "" },
+      { src: "images/photo-260.jpg", caption: "" },
+      { src: "images/photo-261.jpg", caption: "" },
+      { src: "images/photo-262.jpg", caption: "" },
+      { src: "images/photo-263.jpg", caption: "" },
+      { src: "images/photo-264.jpg", caption: "" },
+      { src: "images/photo-265.jpg", caption: "" },
+      { src: "images/photo-266.jpg", caption: "" },
+      { src: "images/photo-267.jpg", caption: "" },
+      { src: "images/photo-268.jpg", caption: "" },
+      { src: "images/photo-269.jpg", caption: "" },
+      { src: "images/photo-270.jpg", caption: "" },
+      { src: "images/photo-271.jpg", caption: "" },
+      { src: "images/photo-272.jpg", caption: "" },
+      { src: "images/photo-273.jpg", caption: "" },
+      { src: "images/photo-274.jpg", caption: "" },
+      { src: "images/photo-275.jpg", caption: "" },
+      { src: "images/photo-276.jpg", caption: "" },
+      { src: "images/photo-277.jpg", caption: "" },
+      { src: "images/photo-278.jpg", caption: "" },
+      { src: "images/photo-279.jpg", caption: "" },
+      { src: "images/photo-280.jpg", caption: "" },
+      { src: "images/photo-281.jpg", caption: "" },
+      { src: "images/photo-282.jpg", caption: "" },
+      { src: "images/photo-283.jpg", caption: "" },
+      { src: "images/photo-284.jpg", caption: "" },
+      { src: "images/photo-285.jpg", caption: "" },
+      { src: "images/photo-286.jpg", caption: "" },
+      { src: "images/photo-287.jpg", caption: "" },
+      { src: "images/photo-288.jpg", caption: "" },
+      { src: "images/photo-289.jpg", caption: "" },
+      { src: "images/photo-290.jpg", caption: "" },
+      { src: "images/photo-291.jpg", caption: "" },
+      { src: "images/photo-292.jpg", caption: "" },
+      { src: "images/photo-293.jpg", caption: "" },
+      { src: "images/photo-294.jpg", caption: "" },
+      { src: "images/photo-295.jpg", caption: "" },
+      { src: "images/photo-296.jpg", caption: "" },
+      { src: "images/photo-297.jpg", caption: "" },
+      { src: "images/photo-298.jpg", caption: "" },
+      { src: "images/photo-299.jpg", caption: "" },
+      { src: "images/photo-300.jpg", caption: "" }
+    ]
+  };
+  /* ============================================================ */
+
+  var favorites = {};
+  var currentIndex = 0;
+
+  /* PASSWORD */
+  document.getElementById("passwordInput").addEventListener("keydown", function(e) {
+    if (e.key === "Enter") checkPassword();
+  });
+
+  function checkPassword() {
+    var val = document.getElementById("passwordInput").value.trim();
+    if (val === CONFIG.password) {
+      document.getElementById("passwordScreen").classList.add("hidden");
+      document.getElementById("galleryScreen").classList.add("visible");
+      buildGallery();
+    } else {
+      document.getElementById("lockError").classList.add("visible");
+      document.getElementById("passwordInput").value = "";
+      document.getElementById("passwordInput").focus();
+    }
+  }
+
+  /* BUILD GALLERY */
+  function buildGallery() {
+    document.getElementById("headerClient").textContent = CONFIG.clientName + " — " + CONFIG.sessionType;
+    document.getElementById("introTitle").innerHTML = CONFIG.clientName.split(" ")[0] + "'s <em>" + CONFIG.sessionType + "</em>";
+    document.getElementById("introSub").textContent = CONFIG.message;
+
+    var meta = document.getElementById("introMeta");
+    var items = [
+      {label:"Session", value:CONFIG.sessionType},
+      {label:"Date", value:CONFIG.sessionDate},
+      {label:"Location", value:CONFIG.location}
+    ];
+    items.forEach(function(item) {
+      var div = document.createElement("div");
+      div.className = "meta-item";
+      div.innerHTML = '<div class="meta-label">'+item.label+'</div><div class="meta-value">'+item.value+'</div>';
+      meta.appendChild(div);
+    });
+
+    // Only show photos that actually exist — preload each image
+    // and only add it to the grid if it loads successfully
+    var grid = document.getElementById("photoGrid");
+    grid.innerHTML = "";
+    var validPhotos = [];
+    var checked = 0;
+
+    function tryAdd(photo, originalIndex) {
+      var img = new Image();
+      img.onload = function() {
+        validPhotos.push({photo: photo, idx: originalIndex});
+        finalize();
+      };
+      img.onerror = function() {
+        finalize(); // skip this one silently
+      };
+      img.src = photo.src;
+    }
+
+    function finalize() {
+      checked++;
+      if (checked < CONFIG.photos.length) return;
+
+      // Sort by original index so order stays consistent
+      validPhotos.sort(function(a, b) { return a.idx - b.idx; });
+
+      // Clear loading spinner
+      document.getElementById("photoGrid").innerHTML = "";
+
+      // Update photo count now that we know real count
+      document.getElementById("photoCount").textContent = validPhotos.length + " photo" + (validPhotos.length !== 1 ? "s" : "");
+      var metaDiv = document.createElement("div");
+      metaDiv.className = "meta-item";
+      metaDiv.innerHTML = '<div class="meta-label">Photos</div><div class="meta-value">'+validPhotos.length+' delivered</div>';
+      meta.appendChild(metaDiv);
+
+      // Build a clean re-indexed array so lightbox navigation works
+      var cleanPhotos = validPhotos.map(function(v) { return v.photo; });
+
+      cleanPhotos.forEach(function(photo, i) {
+        var item = document.createElement("div");
+        item.className = "photo-item";
+        item.dataset.index = i;
+        item.innerHTML =
+          '<img src="'+photo.src+'" alt="Photo '+(i+1)+'" loading="lazy" />' +
+          '<div class="photo-overlay">' +
+            '<div class="overlay-actions">' +
+              '<button class="action-btn btn-fav" data-index="'+i+'" onclick="toggleFav(event,'+i+')" title="Favorite">' +
+                '<svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>' +
+              '</button>' +
+              '<button class="action-btn btn-dl-single" onclick="downloadSingle(event,'+i+')" title="Download">' +
+                '<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' +
+              '</button>' +
+            '</div>' +
+          '</div>' +
+          '<div class="fav-indicator" id="fav-ind-'+i+'">' +
+            '<svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>' +
+          '</div>';
+        item.addEventListener("click", function(e) {
+          if (e.target.closest(".action-btn")) return;
+          openLightbox(i, cleanPhotos);
+        });
+        grid.appendChild(item);
+      });
+
+      // Store clean photos globally for lightbox/download
+      window._galleryPhotos = cleanPhotos;
+    }
+
+    // Kick off preload checks
+    CONFIG.photos.forEach(function(photo, i) {
+      tryAdd(photo, i);
+    });
+  }
+
+  /* FAVORITES */
+  function toggleFav(e, index) {
+    if (e && e.stopPropagation) e.stopPropagation();
+    if (favorites[index]) {
+      delete favorites[index];
+      showToast("Removed from favorites");
+    } else {
+      favorites[index] = true;
+      showToast("Added to favorites");
+    }
+    updateFavUI(index);
+    updateFavCount();
+  }
+
+  function updateFavUI(index) {
+    var btn = document.querySelector(".btn-fav[data-index='"+index+"']");
+    var ind = document.getElementById("fav-ind-"+index);
+    if (favorites[index]) {
+      if (btn) btn.classList.add("faved");
+      if (ind) ind.classList.add("visible");
+    } else {
+      if (btn) btn.classList.remove("faved");
+      if (ind) ind.classList.remove("visible");
+    }
+    var lbFavBtn = document.getElementById("lbFavBtn");
+    var lbFavText = document.getElementById("lbFavText");
+    if (index === currentIndex) {
+      if (favorites[index]) {
+        lbFavBtn.classList.add("faved");
+        lbFavText.textContent = "Favorited";
+      } else {
+        lbFavBtn.classList.remove("faved");
+        lbFavText.textContent = "Add to favorites";
+      }
+    }
+  }
+
+  function updateFavCount() {
+    var count = Object.keys(favorites).length;
+    var wrap = document.getElementById("favCountWrap");
+    var dlFavs = document.getElementById("btnDlFavs");
+    if (count > 0) {
+      wrap.textContent = count + " favorited";
+      wrap.classList.add("visible");
+      dlFavs.classList.add("visible");
+    } else {
+      wrap.classList.remove("visible");
+      dlFavs.classList.remove("visible");
+    }
+  }
+
+  function toggleFavFromLb() {
+    toggleFav(null, currentIndex);
+  }
+
+  /* LIGHTBOX */
+  function openLightbox(index, photos) {
+    var photoList = photos || window._galleryPhotos || CONFIG.photos;
+    currentIndex = index;
+    var photo = photoList[index];
+    document.getElementById("lbImg").src = photo.src;
+    document.getElementById("lbCounter").textContent = (index+1) + " of " + photoList.length;
+    var lbFavBtn = document.getElementById("lbFavBtn");
+    var lbFavText = document.getElementById("lbFavText");
+    if (favorites[index]) { lbFavBtn.classList.add("faved"); lbFavText.textContent = "Favorited"; }
+    else { lbFavBtn.classList.remove("faved"); lbFavText.textContent = "Add to favorites"; }
+    document.getElementById("lightbox").classList.add("open");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeLightbox() {
+    document.getElementById("lightbox").classList.remove("open");
+    document.body.style.overflow = "";
+  }
+
+  function navigateLightbox(dir) {
+    var photoList = window._galleryPhotos || CONFIG.photos;
+    currentIndex = (currentIndex + dir + photoList.length) % photoList.length;
+    openLightbox(currentIndex, photoList);
+  }
+
+  document.getElementById("lbClose").addEventListener("click", closeLightbox);
+  document.getElementById("lbPrev").addEventListener("click", function(){navigateLightbox(-1);});
+  document.getElementById("lbNext").addEventListener("click", function(){navigateLightbox(1);});
+  document.getElementById("lightbox").addEventListener("click", function(e){
+    if (e.target === document.getElementById("lightbox")) closeLightbox();
+  });
+  document.addEventListener("keydown", function(e){
+    if (!document.getElementById("lightbox").classList.contains("open")) return;
+    if (e.key === "Escape") closeLightbox();
+    if (e.key === "ArrowLeft") navigateLightbox(-1);
+    if (e.key === "ArrowRight") navigateLightbox(1);
+  });
+
+  /* DOWNLOADS */
+  function downloadSingle(eOrIndex, maybeIndex) {
+    var index = typeof eOrIndex === "number" ? eOrIndex : maybeIndex;
+    if (eOrIndex && eOrIndex.stopPropagation) eOrIndex.stopPropagation();
+    var photoList = window._galleryPhotos || CONFIG.photos;
+    var src = photoList[index].src;
+    var filename = src.split("/").pop();
+    var a = document.createElement("a");
+    a.href = src; a.download = filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    showToast("Downloading photo " + (index+1));
+  }
+
+  function downloadAll() {
+    var photoList = window._galleryPhotos || CONFIG.photos;
+    showToast("Downloading all " + photoList.length + " photos...");
+    photoList.forEach(function(photo, i) {
+      setTimeout(function() {
+        var filename = photo.src.split("/").pop();
+        var a = document.createElement("a");
+        a.href = photo.src; a.download = filename;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      }, i * 400);
+    });
+  }
+
+  function downloadFavorites() {
+    var favKeys = Object.keys(favorites);
+    if (favKeys.length === 0) { showToast("No favorites yet — heart some photos first!"); return; }
+    var photoList = window._galleryPhotos || CONFIG.photos;
+    showToast("Downloading " + favKeys.length + " favorited photos...");
+    favKeys.forEach(function(key, i) {
+      setTimeout(function() {
+        var photo = photoList[parseInt(key)];
+        var filename = photo.src.split("/").pop();
+        var a = document.createElement("a");
+        a.href = photo.src; a.download = filename;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      }, i * 400);
+    });
+  }
+
+  /* TOAST */
+  function showToast(msg) {
+    var toast = document.getElementById("toast");
+    toast.textContent = msg;
+    toast.classList.add("show");
+    setTimeout(function(){ toast.classList.remove("show"); }, 2500);
+  }
+</script>
+</body>
+</html>
