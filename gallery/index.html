@@ -7,11 +7,11 @@
   <meta name="description" content="Browse TevezuMedia's full photography gallery — portraits, events, weddings, lifestyle, family, sports, and basketball mixtapes shot in Boston and beyond." />
   <meta property="og:title" content="Gallery — TevezuMedia" />
   <meta property="og:description" content="Browse the full gallery — portraits, events, weddings, sports, mixtapes and more." />
-  <meta property="og:image" content="https://tevezu.com/images/cover-1.jpg" />
+  <meta property="og:image" content="https://tevezu.com/images/featured-1.jpg" />
   <meta property="og:url" content="https://tevezu.com/gallery" />
   <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:image" content="https://tevezu.com/images/cover-1.jpg" />
+  <meta name="twitter:image" content="https://tevezu.com/images/featured-1.jpg" />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
@@ -187,11 +187,11 @@
     <button class="filter-btn" data-filter="mixtapes">Mixtapes</button>
     <div class="filter-hint">Drag to explore · Click to open</div>
     <div class="view-toggle">
-      <button class="view-btn active" id="btnGalaxy" title="Galaxy view">
+      <button class="view-btn" id="btnGalaxy" title="Galaxy view">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="5" cy="6" r="2"/><circle cx="19" cy="5" r="1.5"/><circle cx="4" cy="17" r="1.5"/><circle cx="20" cy="16" r="2"/><circle cx="12" cy="21" r="1"/></svg>
         Galaxy
       </button>
-      <button class="view-btn" id="btnGrid" title="Grid view">
+      <button class="view-btn active" id="btnGrid" title="Grid view">
         <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
         Grid
       </button>
@@ -634,12 +634,11 @@ document.addEventListener("keydown", function(e){
 });
 
 /* ── GRID VIEW ── */
-var isGalaxyView = true;
 function buildGrid(filter) {
   var masonry = document.getElementById("gridMasonry");
   masonry.innerHTML = "";
   var filtered = filter==="all" ? photos : photos.filter(function(p){return p.cat===filter;});
-  filtered.forEach(function(photo, i) {
+  filtered.forEach(function(photo) {
     var item = document.createElement("div");
     item.className = "grid-item";
     item.innerHTML = '<img src="'+photo.src+'" alt="'+photo.title+'" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';"/><div class="grid-placeholder" style="display:none"><span>'+photo.cat+'</span></div><div class="grid-overlay"><span class="grid-cat">'+photo.cat+'</span></div>';
@@ -647,23 +646,36 @@ function buildGrid(filter) {
     masonry.appendChild(item);
   });
 }
+
+/* ── VIEW TOGGLE ── */
+var isGalaxyView = false;
+
+// Start in grid view by default
+document.getElementById("canvasWrap").style.display = "none";
+document.getElementById("starCanvas").style.display = "none";
+document.getElementById("gridView").classList.add("active");
+document.getElementById("zoomControls").style.display = "none";
+buildGrid("all");
+
 document.getElementById("btnGalaxy").addEventListener("click", function() {
-  isGalaxyView=true;
+  if (isGalaxyView) return;
+  isGalaxyView = true;
   document.getElementById("btnGalaxy").classList.add("active");
   document.getElementById("btnGrid").classList.remove("active");
-  document.getElementById("canvasWrap").style.display="block";
-  document.getElementById("starCanvas").style.display="block";
+  document.getElementById("canvasWrap").style.display = "block";
+  document.getElementById("starCanvas").style.display = "block";
   document.getElementById("gridView").classList.remove("active");
-  document.getElementById("zoomControls").style.display="flex";
+  document.getElementById("zoomControls").style.display = "flex";
 });
 document.getElementById("btnGrid").addEventListener("click", function() {
-  isGalaxyView=false;
+  if (!isGalaxyView) return;
+  isGalaxyView = false;
   document.getElementById("btnGrid").classList.add("active");
   document.getElementById("btnGalaxy").classList.remove("active");
-  document.getElementById("canvasWrap").style.display="none";
-  document.getElementById("starCanvas").style.display="none";
+  document.getElementById("canvasWrap").style.display = "none";
+  document.getElementById("starCanvas").style.display = "none";
   document.getElementById("gridView").classList.add("active");
-  document.getElementById("zoomControls").style.display="none";
+  document.getElementById("zoomControls").style.display = "none";
   buildGrid(activeFilter);
 });
 
