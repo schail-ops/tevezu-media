@@ -95,7 +95,7 @@
 ============================================================ */
 var CONFIG = {
   password:    "erline",
-  oneDriveUrl: "https://1drv.ms/f/c/9b859c591712b565/IgAvxIWOw0bbQo9pASVddYRDAU1mNAmgYd66758tXr5_KF4?e=8RdRhb",
+  oneDriveUrl: "https://1drv.ms/f/c/9b859c591712b565/IgAvxIWOw0bbQo9pASVddYRDAU1mNAmgYd66758tXr5_KF4?e=kn87hJ",
   session:     "portraits",
   clientName:  "Erline"
 };
@@ -186,7 +186,7 @@ function animPortraits(canvas, ctx) {
     for (var l=0;l<H;l+=3){ctx.beginPath();ctx.moveTo(0,l);ctx.lineTo(W,l);ctx.stroke();}
     var cov=pools[0].r>=maxR*0.72;
     if (cov&&!shown){shown=true;showMsg("Your portraits<br>are <em>ready</em>","#3B2A1A","rgba(80,60,40,0.45)");}
-    if (cov&&!done){done=true;redirect("#C9A882",700);}
+    if (cov&&!done){done=true;redirect("#C9A882",2000);}
     if (!done) requestAnimationFrame(draw);
   }
   requestAnimationFrame(draw);
@@ -226,7 +226,7 @@ function animSports(canvas, ctx) {
     // shutter flash
     if (el>700) { flash=Math.min(1,(el-700)/180); ctx.fillStyle="rgba(255,255,255,"+flash+")"; ctx.fillRect(0,0,W,H); }
     if (flash>=0.95&&!shown){shown=true;showMsg("Your shots<br>are <em>fire</em>","#080808","rgba(8,8,8,0.4)");}
-    if (flash>=0.95&&!done){done=true;redirect("#111",600);}
+    if (flash>=0.95&&!done){done=true;redirect("#111",2000);}
     if (!done) requestAnimationFrame(draw);
   }
   requestAnimationFrame(draw);
@@ -271,7 +271,7 @@ function animWeddings(canvas, ctx) {
       ctx.restore();
     });
     if (bg>=0.88&&!shown){shown=true;showMsg("Your wedding photos<br>are <em>beautiful</em>","#5C2A2A","rgba(92,42,42,0.4)");}
-    if (bg>=0.88&&!done){done=true;redirect("#D4A0A0",1000);}
+    if (bg>=0.88&&!done){done=true;redirect("#D4A0A0",2000);}
     if (!done) requestAnimationFrame(draw);
   }
   requestAnimationFrame(draw);
@@ -323,7 +323,7 @@ function animLifestyle(canvas, ctx) {
     ctx.fillStyle=hg; ctx.fillRect(0,0,W,H);
     var cov=r>=maxR*0.6;
     if (cov&&!shown){shown=true;showMsg("Your lifestyle shots<br>are <em>golden</em>","#FFF3DC","rgba(255,230,150,0.55)");}
-    if (cov&&!done){done=true;redirect("#B04010",800);}
+    if (cov&&!done){done=true;redirect("#B04010",2000);}
     if (!done) requestAnimationFrame(draw);
   }
   requestAnimationFrame(draw);
@@ -376,7 +376,7 @@ function animEvents(canvas, ctx) {
     });
     var cov=spots[0].r>=spots[0].max*0.88;
     if (cov&&!shown){shown=true;showMsg("Your event photos<br>are <em>lit</em>","#FFF8DC","rgba(255,235,150,0.5)");}
-    if (cov&&!done){done=true;redirect("#120C00",900);}
+    if (cov&&!done){done=true;redirect("#120C00",2000);}
     if (!done) requestAnimationFrame(draw);
   }
   requestAnimationFrame(draw);
@@ -451,7 +451,7 @@ function animMixtapes(canvas, ctx) {
       showMsg("Your mixtape<br>is <em>ready</em>","#00FF41","rgba(0,255,65,0.38)");
       document.getElementById("msgTitle").style.letterSpacing="0.06em";
     }
-    if (el>2800&&!done){done=true;redirect("#001A00",400);}
+    if (el>2800&&!done){done=true;redirect("#001A00",2000);}
     if (!done) requestAnimationFrame(draw);
   }
   requestAnimationFrame(draw);
