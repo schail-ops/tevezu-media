@@ -58,8 +58,8 @@
       flex: 1;
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
-      text-align: center; padding: 4rem 2rem;
-      position: relative; overflow: hidden;
+      text-align: center; padding: 4rem 2rem 5rem;
+      position: relative;
     }
     .portal-hero::before {
       content: '';
@@ -136,7 +136,7 @@
 
     .portal-hint {
       font-size: 12px; font-weight: 300; color: var(--muted-2);
-      margin-top: 10px; text-align: left;
+      margin-top: 10px; margin-bottom: 4px; text-align: left; line-height: 1.6;
     }
     .portal-hint span { color: var(--brown-pale); font-style: italic; }
 
@@ -424,7 +424,7 @@
         </div>
         <div class="faq-item">
           <div class="faq-q">What if I can't find my gallery name?</div>
-          <div class="faq-a">Check the email from Tevez — it includes your gallery name and password. If you can't find it, email schailtevez@gmail.com and he'll resend it.</div>
+          <div class="faq-a">Check the email from Tevez — it includes your gallery name and password. If you can't find it, email <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="1360707b727a7f677665766953747e727a7f3d707c7e">[email&#160;protected]</a> and he'll resend it.</div>
         </div>
       </div>
     </div>
@@ -455,7 +455,7 @@
     </div>
   </footer>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
   document.getElementById("galleryInput").addEventListener("keydown", function(e) {
     if (e.key === "Enter") goToGallery();
     document.getElementById("portalError").classList.remove("visible");
