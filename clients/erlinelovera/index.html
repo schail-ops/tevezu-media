@@ -95,8 +95,9 @@
 ============================================================ */
 var CONFIG = {
   password:    "erline",
-  oneDriveUrl: "https://1drv.ms/f/c/9b859c591712b565/IgAvxIWOw0bbQo9pASVddYRDAU1mNAmgYd66758tXr5_KF4?e=CXSFYJ",
-  session:     "portraits"
+  oneDriveUrl: "https://1drv.ms/f/c/9b859c591712b565/IgAvxIWOw0bbQo9pASVddYRDAU1mNAmgYd66758tXr5_KF4?e=8RdRhb",
+  session:     "portraits",
+  clientName:  "Erline"
 };
 /* ============================================================ */
 
@@ -137,8 +138,9 @@ function checkPassword() {
   fn(canvas, ctx);
 }
 
-function showMsg(title, titleColor, subColor) {
-  document.getElementById("msgTitle").innerHTML = title;
+function showMsg(line2, titleColor, subColor) {
+  var name = CONFIG.clientName || "Hey";
+  document.getElementById("msgTitle").innerHTML = "Hi, " + name + "!<br>" + line2;
   document.getElementById("msgTitle").style.color = titleColor;
   document.getElementById("msgSub").style.color = subColor;
   document.getElementById("unlockMessage").classList.add("show");
